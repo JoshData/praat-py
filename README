@@ -1,0 +1,15 @@
+Praat-Py: Extended Praat for Python Scripting
+=============================================
+
+By Joshua Tauberer <http://razor.occams.info>
+
+These files are released under the same terms as Praat itself,
+the GPL v2 or later.
+
+This extension adds support for scripting Praat using Python,
+rather than Praat's own scripting language. More information
+is available here:
+
+http://razor.occams.info/code/praat-py
+
+
