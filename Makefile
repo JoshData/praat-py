@@ -3,11 +3,12 @@ ORIGINALS=originals-4509
 DISTFILES=README Makefile \
 		mono_embed.c mono_embed.h PraatMonoEmbed.cs PraatTypeWrappers.cs \
 		makefile.patch Interpreter.patch \
-		libs/*
+		libs/PraatMonoEmbed.dll libs/Iron*.dll
 
 all: libs/js.dll libs/PraatMonoEmbed.dll mono_embed
 
 dist: dist/praat-py.zip dist/praat-py_linux_i386
+	scp -r dist publius:www/code/praat-py
 
 PraatTypeWrappers.cs: create_class_wrappers.pl
 	perl create_class_wrappers.pl > PraatTypeWrappers.cs
