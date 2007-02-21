@@ -89,7 +89,11 @@ public class PraatMonoEmbed {
 	}
 	#endif
 	
-	class Praat : PraatTypes.PraatStaticMethods {
+	class Praat 
+	#if FALSE
+	: PraatTypes.PraatStaticMethods 
+	#endif
+	{
 		public void print(string message) {
 			PraatMonoEmbed.Echo(message + "\n");
 		}

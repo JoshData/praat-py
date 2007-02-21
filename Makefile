@@ -1,11 +1,11 @@
 SOURCES=mono_embed.c mono_embed_host.c mono_embed_libs.o
-ORIGINALS=originals-4509
+ORIGINALS=originals-4514
 DISTFILES=README Makefile \
-		mono_embed.c mono_embed.h PraatMonoEmbed.cs PraatTypeWrappers.cs \
+		mono_embed.c mono_embed.h PraatMonoEmbed.cs \
 		makefile.patch Interpreter.patch \
 		libs/PraatMonoEmbed.dll libs/Iron*.dll
 
-all: libs/js.dll libs/PraatMonoEmbed.dll mono_embed
+all: libs/PraatMonoEmbed.dll mono_embed
 
 dist: dist/praat-py.zip dist/praat-py_linux_i386
 	scp -r dist publius:www/code/praat-py
@@ -13,8 +13,8 @@ dist: dist/praat-py.zip dist/praat-py_linux_i386
 PraatTypeWrappers.cs: create_class_wrappers.pl
 	perl create_class_wrappers.pl > PraatTypeWrappers.cs
 
-libs/PraatMonoEmbed.dll: PraatMonoEmbed.cs PraatTypeWrappers.cs
-	gmcs PraatMonoEmbed.cs PraatTypeWrappers.cs -target:library -out:libs/PraatMonoEmbed.dll \
+libs/PraatMonoEmbed.dll: PraatMonoEmbed.cs
+	gmcs PraatMonoEmbed.cs -target:library -out:libs/PraatMonoEmbed.dll \
 		-r:libs/IronPython.dll -d:PYTHON
 
 #		-r:libs/js.dll -d:JAVASCRIPT \
@@ -42,10 +42,10 @@ libs/js.dll:
 patches: Interpreter.patch makefile.patch
 
 Interpreter.patch: $(ORIGINALS)/Interpreter.c ../sys/Interpreter.c
-	true || diff -u $(ORIGINALS)/Interpreter.c ../sys/Interpreter.c > Interpreter.patch
+	diff -u $(ORIGINALS)/Interpreter.c ../sys/Interpreter.c > Interpreter.patch || true
 
 makefile.patch: $(ORIGINALS)/makefile ../makefile
-	true || diff -u $(ORIGINALS)/makefile ../makefile > makefile.patch
+	diff -u $(ORIGINALS)/makefile ../makefile > makefile.patch || true
 
 patch-praat:
 	patch ../makefile makefile.patch
