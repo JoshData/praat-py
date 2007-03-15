@@ -191,7 +191,7 @@ endfor</pre></td>
 
 <h3>Downloading Praat-Py</h3>
 <div class="section">
-<p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain operating systems because that is what I have available to create it for.</p>
+<p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain operating systems (i.e. Linux) because that is what I have available to create it for.</p>
 
 <p>You will need to have Mono installed, the open-source implementation
 of the Microsoft .NET Framework.  Grab it <a href="http://mono-project.com/Downloads">from here</a>.</p>
@@ -203,7 +203,7 @@ of the Microsoft .NET Framework.  Grab it <a href="http://mono-project.com/Downl
 	<div><b>Praat-Py version 0.1 (January 11, 2007)</b></div>
 	</div>
 
-<p>Linux i386: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></p>
+<p>Linux Fedora Core 6/i386/32bit Download: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></p>
 
 <!--<p>Windows: <a href="dist/praat-py.exe">praat-py.exe</a></p>-->
 
@@ -226,14 +226,16 @@ of the Microsoft .NET Framework.  Grab it <a href="http://mono-project.com/Downl
 	<pre class="code">#python
 print 11500 * 20</pre>
 
-	<p>The next way is to have Praat do something.  You do this with the <code>praat.go(<i>command</i>, <i>arguments...</i>)</code> function.</p>
+	<p>The next way is to have Praat do one of its commands on a menu or the main window buttons.  You do this with the <code>praat.go(<i>command</i>, <i>arguments...</i>)</code> function.</p>
 	
 	<pre class="code">#python
-praat.go("select", "LongSound en_4813_B")
-praat.go("To Spectrogram...", .005, 5000, .002, 20, "Gaussian")
+praat.go("To Spectrogram...", .005, maxfreq, .002, 20, "Gaussian")
 praat.go("View")</pre>
 
-	<p>The first argument to the <code>praat.go</code> function is the name of a command on a Praat menu to run.  The remaning arguments are any options that that command takes, in the order that they show up in Praat.</p>
+	<p>The first argument to the <code>praat.go</code> function is the name of a command on a Praat menu to run.  The remaning arguments are any options that that command takes, in the order that they show up in Praat.
+	You'll notice that as compared to Praat Script, they way you put the arguments
+	together is significantly more straight-forward.  To use variables, for instance,
+	you just use them (no strange quotes).</p>
 
 	<p>The third way is to have Praat do something but to capture the result of what it does.  You can capture numeric results with <code>praat.getNum(<i>command</i>, <i>arguments...</i>)</code>:</p>
 
@@ -326,12 +328,12 @@ $ make patch-praat
 <p>5) Then exit out of the <tt>scripting</tt> directory and build Praat.</p>
 
 <pre class="code">
-cd ..
-make
+$ cd ..
+$ make
 </pre>
 
 <p>The <tt>praat</tt> executable in the current directory will
-now be a lot larger, and it will support Python scripts now.</p>
+now be a lot larger, and it will support Python scripts.</p>
 </div>
 
 	</body>
