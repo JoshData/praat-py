@@ -1,8 +1,7 @@
 SOURCES=mono_embed.c mono_embed_host.c mono_embed_libs.o
-ORIGINALS=originals-4514
 DISTFILES=README Makefile \
 		mono_embed.c mono_embed.h PraatMonoEmbed.cs \
-		makefile.patch Interpreter.patch \
+		patch.pl \
 		libs/PraatMonoEmbed.dll libs/Iron*.dll
 
 all: libs/PraatMonoEmbed.dll mono_embed
@@ -39,17 +38,12 @@ libs/js.dll:
 	ikvmc libs/js.jar
 	rm libs/js.jar
 
-patches: Interpreter.patch makefile.patch
-
-Interpreter.patch: $(ORIGINALS)/Interpreter.c ../sys/Interpreter.c
-	diff -u $(ORIGINALS)/Interpreter.c ../sys/Interpreter.c > Interpreter.patch || true
-
-makefile.patch: $(ORIGINALS)/makefile ../makefile
-	diff -u $(ORIGINALS)/makefile ../makefile > makefile.patch || true
-
 patch-praat:
-	patch ../makefile makefile.patch
-	patch ../sys/Interpreter.c Interpreter.patch
+	perl patch.pl ../makefile "cd artsynth; make" "\tcd scripting; make"
+	perl patch.pl ../makefile "artsynth/libartsynth.a" "\t\tscripting/mono_embed.o scripting/mono_embed_host.o scripting/mono_embed_libs.o \`pkg-config --libs mono\` -lz \\"
+	perl patch.pl ../sys/Interpreter.c "#include \"Formula.h\"" "#include \"../scripting/mono_embed.h\""
+	perl patch.pl ../sys/Interpreter.c "int Interpreter_run \(" \
+		"\tif (strncmp(text, "#python", 7) == 0) {\n\t\tmono_embed_run_praat_script(me, text);\n\t\treturn 1;\n\t}"
 
 dist/praat-py.zip: $(DISTFILES)
 	rm -f dist/praat-py.zip
