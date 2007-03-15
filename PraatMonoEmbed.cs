@@ -102,7 +102,11 @@ public class PraatMonoEmbed {
 			string ret = command;
 			for (int i = 0; i < args.Length; i++) {
 				ret += " ";
-				string a = args[i].ToString();
+				string a = null;
+				if (args[i] is bool)
+					a = ((bool)args[i]) ? "true" : "false";
+				else
+					a = args[i].ToString();
 				if (i != args.Length-1 && (a.IndexOf(' ') == -1 || (args[i] is double && a.IndexOf('.') == -1))) {
 					// need to quote the argument, but we never quote the last one (as per Praat docs)
 					ret += "\"" + a.Replace("\"", "\"\"") + "\"";

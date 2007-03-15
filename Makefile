@@ -43,7 +43,7 @@ patch-praat:
 	perl patch.pl ../makefile "artsynth/libartsynth.a" "\t\tscripting/mono_embed.o scripting/mono_embed_host.o scripting/mono_embed_libs.o \`pkg-config --libs mono\` -lz \\"
 	perl patch.pl ../sys/Interpreter.c "#include \"Formula.h\"" "#include \"../scripting/mono_embed.h\""
 	perl patch.pl ../sys/Interpreter.c "int Interpreter_run \(" \
-		"\tif (strncmp(text, "#python", 7) == 0) {\n\t\tmono_embed_run_praat_script(me, text);\n\t\treturn 1;\n\t}"
+		"\tif (strncmp(text, \"#python\", 7) == 0) {\n\t\tmono_embed_run_praat_script(me, text);\n\t\treturn 1;\n\t}"
 
 dist/praat-py.zip: $(DISTFILES)
 	rm -f dist/praat-py.zip
