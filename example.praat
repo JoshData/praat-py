@@ -1,4 +1,4 @@
-#python
+#lang=python
 # Make a temporary selection from the original sound:
 cursor = praat.getNum("Get cursor")
 start = cursor - 0.02

@@ -17,35 +17,39 @@
 <h2>Introduction</h2>
 <div class="section">
 <p>This project is an extension to <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
-a computer program for doing phonetic analysis on sound files used
-by linguists, to allow for scripts to be written in the Python programming
+the computer program used by linguists for doing phonetic analysis on sound files,
+to allow for scripts to be written in the Python programming
 language, rather than in Praat's built-in language.</p>
 
 <p>The motivation for this extension is to remove the need for Praat Script writers to
 learn an entirely new programming language if they already know Python.
 Additionally, Python is a more complete programming language and so scripts of any complexity should be
-more easily written in Python.</p>
+more easily written in Python. The goal isn't to make all scripts easier or shorter to write, but
+it make it possible to do some tasks more easily.</p>
 
 <p>All of the functionality of Praat's scripting language is (meant to) be retained
-when using Python.  However, forms are not implemented yet.</p>
+when using Python.  However, forms are not implemented yet. Likewise, because
+the Python interpreter is used, all Python functionality is possible, such as using
+all Python modules that you happen to have installed.</p>
 
 <p>This project is released under the same terms as Praat itself,
 the GPL v2 or later.</p>
 
-<p>Praat-Py works by embedding the <a href="http://www.mono-project.com">Mono</a> .NET runtime and the <a href="http://www.codeplex.com/Wiki/View.aspx?ProjectName=IronPython">IronPython</a> engine into Praat.</p>
-(It is also possible to compile the extension to use JavaScript using <a href="http://www.mozilla.org/rhino/">Rhino</a>,
-but this is off by default.)</div>
+<p>Praat-Py works by linking to the Python interpreter. By and large, you will need to
+compile Praat-Py from sources yourself, which means you are probably on a Linux or Mac OSX
+computer. In that case, you must have Python installed (and possibly development files
+as well, i.e. the python-devel package or the like).</p>
+</div>
 
 <h2>Examples</h2>
 
 
 <div class="section">
 <p>The following is an example script for Praat written in Python,
-and on the right is the corresponding script in Praat Script.</p>
-
-<p>The script draws a spectrum for a 40 ms window around the cursor
-in the sound editor window.  The script (and this description) are
-based on the script <a href="http://www.helsinki.fi/~lennes/praat-scripts/public/draw_spectrum_from_selection.praat">here</a>
+and on the right is the corresponding script in Praat Script.
+The script converts all .aif files in a directory into .wav format, resamping them in
+the process. The Praat script on the right is
+based on the script <a href="http://www.helsinki.fi/~lennes/praat-scripts/public/convert_aiff_files_to_16kHz_wav.praat">here</a>
 by Mietta Lennes.</p>
 
 <table border="1" cellpadding="10">
@@ -53,110 +57,26 @@ by Mietta Lennes.</p>
 
 <tr valign="top">
 <td>
-<pre>#python
-# Make a temporary selection from the original sound:
-cursor = praat.getNum("Get cursor")
-start = cursor - 0.02
-end = cursor + 0.02
-praat.go("Select...", start, end)
+<pre>#lang=python
+from glob import glob
 
-# name the new Sound object according to the time point
-# where the cursor was
-milliseconds = int(cursor * 1000)
-objName = "FFT_" + str(milliseconds) + "ms"
-praat.go("Extract windowed selection...", objName, "Kaiser2", "2", "no")
-
-# leave the Sound editor for a while to calculate and draw
-# the spectrum
-praat.go("endeditor")
-
-# Make the Spectrum object from the new Sound
-praat.go("To Spectrum")
-praat.go("Edit")
-praat.go("editor", "Spectrum " + objName)
-# zoom the spectrum to a comfortable frequency view...
-praat.go("Zoom...", 0, 5000)
-praat.go("endeditor")
-
-# select and remove the temporary Sound object 
-praat.select("Sound " + objName)
-praat.go("Remove")
-
-# return to the Sound editor window and recall the original
-# cursor position
-praat.go("editor")
-praat.go("Move cursor to...", cursor)</pre>
-</td>
-
-<td>
-<pre># Make a temporary selection from the original sound:
-
-cursor = Get cursor
-start = cursor - 0.02
-end = cursor + 0.02
-Select... start end
-
-# name the new Sound object according to the time point
-# where the cursor was
-milliseconds = round (cursor * 1000)
-
-Extract windowed selection... FFT_'milliseconds'ms Kaiser2 2 no
-
-# leave the Sound editor for a while to calculate and draw
-# the spectrum
-endeditor
-
-# Make the Spectrum object from the new Sound
-To Spectrum
-Edit
-editor Spectrum FFT_'milliseconds'ms
-# zoom the spectrum to a comfortable frequency view...
-Zoom... 0 5000
-endeditor
-
-# select and remove the temporary Sound object 
-select Sound FFT_'milliseconds'ms
-Remove
-
-# return to the Sound editor window and recall the original
-# cursor position
-editor
-Move cursor to... cursor</pre>
-</td>
-</tr>
-</table>
-
-<p>Here's another script by the same author that convert AIFF audio files
-in a given directory into WAV files.</p>
-
-<table border="1" cellpadding="10">
-<tr><th>Python (with Praat-Py)</th> <th>Praat Script (with Praat-Py or regular Praat)</th></tr>
-
-<tr valign="top">
-<td>
-<pre>#python
 aiffdir = "/home/tauberer/my-aif-files/"
 delete_AIFF_files_after_conversion = False
 
-praat.go("Create Strings as file list...", "aifffiles", aiffdir + "*.aif")
-
-for i in range(int(praat.getNum("Get number of strings"))) :
-   praat.select("Strings aifffiles")
-   file = praat.getString("Get string...", i+1)
-   praat.go("Read from file...", aiffdir + file)
-   soundtype, soundname = praat.selected().split()
-   praat.go("Rename...", "temp")
+for file in glob(aiffdir + "*.aif") :
+   go("Read from file...", file)
+   soundtype, soundname = selected().split()
+   go("Rename...", "temp")
    print "Converting file", file, "..."
-   praat.go("Resample...", 16000, 50)
-   praat.go("Rename...", soundname)
-   praat.select("Sound temp")
-   praat.go("Remove")
-   praat.select("Sound " + soundname)
-   praat.go("Write to WAV file...", aiffdir + soundname + ".wav")
+   go("Resample...", 16000, 50)
+   go("Rename...", soundname)
+   select("Sound temp")
+   go("Remove")
+   select("Sound " + soundname)
+   go("Write to WAV file...", aiffdir + soundname + ".wav")
    if delete_AIFF_files_after_conversion :
-      praat.go("filedelete", aiffdir + file)
-   praat.go("Remove")
-</pre>
+      go("filedelete", file)
+   go("Remove")</pre>
 </td>
 <td>
 <pre>Create Strings as file list... aifffiles 'aiffdir$'*.aif
@@ -193,8 +113,7 @@ endfor</pre></td>
 <div class="section">
 <p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain operating systems (i.e. Linux) because that is what I have available to create it for.</p>
 
-<p>You will need to have Mono installed, the open-source implementation
-of the Microsoft .NET Framework.  Grab it <a href="http://mono-project.com/Downloads">from here</a>.</p>
+<p>You will need to have <a href="http://www.python.org">Python</a> 2.5 or later installed. (Maybe it works with earlier Pythons. I haven't tried.)</p>
 
 <p>The ready-to-go Praat-Py downloads here are currently based on:</p>
 	<div style="margin-left: 2em">
@@ -203,7 +122,11 @@ of the Microsoft .NET Framework.  Grab it <a href="http://mono-project.com/Downl
 	<div><b>Praat-Py version 0.1 (January 11, 2007)</b></div>
 	</div>
 
-<p>Linux Fedora Core 6/i386/32bit Download: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></p>
+<dl>
+<dt>Pre-made (Binary) Downloads:</dt>
+<dd>Linux Fedora Core 7/i386/32bit Download: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></dd>
+<dd>That's it. Sorry!</dd>
+</dl>
 
 <!--<p>Windows: <a href="dist/praat-py.exe">praat-py.exe</a></p>-->
 
@@ -217,77 +140,56 @@ of the Microsoft .NET Framework.  Grab it <a href="http://mono-project.com/Downl
 
 	<p>Once you have Praat-Py, you can write scripts in Python rather than Praat's own scripting language.  You should be roughly familiar with Praat scripting before reading on (see <a href="http://www.fon.hum.uva.nl/praat/manual/Scripting.html">this page</a>).  To script with Python, all you have to do is start your scripts with this:</p>
 	
-	<pre class="code">#python</pre>
+	<pre class="code">#lang=python</pre>
 	
-	<p>That is, the very first line of your script must be a hash (#) followed immediately by the word "python" in lowercase letters.  This instructs Praat to interpret the remainder of your script as Python code.</p>
+	<p>That is, the very first line of your script must be a hash (#) followed immediately by "lang=python" in lowercase letters.  This instructs Praat to interpret the remainder of your script as Python code.</p>
 	
 	<p>There are several ways your Python script can make Praat do things.  The first way is via the <code>print</code> Python command, which will output a string to the Praat Info window:</p>
 
-	<pre class="code">#python
+	<pre class="code">#lang=python
 print 11500 * 20</pre>
 
-	<p>The next way is to have Praat do one of its commands on a menu or the main window buttons.  You do this with the <code>praat.go(<i>command</i>, <i>arguments...</i>)</code> function.</p>
+	<p>The next way is to have Praat do one of its commands on a menu or the main window buttons.  You do this with the <code>go(<i>command</i>, <i>arguments...</i>)</code> function.</p>
 	
-	<pre class="code">#python
+	<pre class="code">#lang=python
 praat.go("To Spectrogram...", .005, maxfreq, .002, 20, "Gaussian")
 praat.go("View")</pre>
 
-	<p>The first argument to the <code>praat.go</code> function is the name of a command on a Praat menu to run.  The remaning arguments are any options that that command takes, in the order that they show up in Praat.
+	<p>The first argument to the <code>go</code> function is the name of a command on a Praat menu to run.  The remaning arguments are any options that that command takes, in the order that they show up in Praat.
 	You'll notice that as compared to Praat Script, they way you put the arguments
 	together is significantly more straight-forward.  To use variables, for instance,
-	you just use them (no strange quotes).</p>
+	you just use them (no strange quotes). In Praat Script, you never quote the final argument. Here, you quote all arguments uniformly: strings are quoted, and nothing else, as in Python normally.</p>
 
-	<p>The third way is to have Praat do something but to capture the result of what it does.  You can capture numeric results with <code>praat.getNum(<i>command</i>, <i>arguments...</i>)</code>:</p>
+	<p>The third way is to have Praat do something but to capture the result of what it does.  You can capture numeric results with <code>getNum(<i>command</i>, <i>arguments...</i>)</code>:</p>
 
-	<pre class="code">#python
-print "The start time is: ", praat.getNum("Get end time")*1000, " (ms)"</pre>
+	<pre class="code">#lang=python
+print "The end time is: ", getNum("Get end time")*1000, " (ms)"</pre>
 
-	<p>As in regular Praat scripts, this works by capturing the first number the command would normally print to Praat's Info window.  As with <code>praat.go</code>, you can provide any number of arguments to <code>praat.getNum</code></p>
+	<p>As in regular Praat scripts, this works by capturing the first number the command would normally print to Praat's Info window.  As with <code>go</code>, you can provide any number of arguments to <code>getNum</code>. <code>getNum</code> returns a Python float value.</p>
 	
-	<p>There is also a function <code>praat.getString</code> which works like <code>praat.getNum</code> but it returns the entire output line sent to the Info window by the command.</p>
+	<p>There is also a function <code>getString</code> which works like <code>getNum</code> but it returns the entire output line sent to the Info window by the command as a Python string value.</p>
+
+	<pre class="code">#lang=python
+print "The end time is: ", getString("Get end time")</pre>
 	
 	<p>Two additional commands are provided to make it easier to work with Praat's selected 
-	objects. <code>praat.select(<i>object name</i>)</code> selects an object by its name.  It's 
-	just a convenience; you can also use <code>praat.go("select", <i>objectname</i>)</code>
+	objects. <code>select(<i>object name</i>)</code> selects an object by its name.  It's 
+	just a convenience; you can also use <code>go("select", <i>objectname</i>)</code>
 	(and of course with "plus" and "minus", too, to toggle the selection of objects).
-	<code>praat.selected()</code> returns the name of the selected object.</p>
+	<code>selected()</code> is a function that returns the name of the selected object.</p>
 	
-	<pre class="code">#python
-praat.select("Sound mysound")
-print praat.selected() # prints "LongSound mysound"</pre>
+	<pre class="code">#lang=python
+select("Sound mysound")
+print selected() # prints "Sound mysound"</pre>
 </div>
 
 
 <h2>Limitations</h2>
 <div class="section">
 <p>Praat forms not implemented</p>
-<p>Only a few Python modules supported by IronPython</p>
-<p>Errors in program don't tell you where the error occurred</p>
-<p>Need to have Mono installed</p>
 <p>I don't know how to build Praat on Windows, so there's no Windows version</p>
 <p>It would be nice to be able to manipulate Praat from an externally running script, too</p>
 <p>Can we get some or all of this integrated into the main Praat distribution?</p>
-</div>
-
-<h2>How It Works</h2>
-<div class="section">
-<p>Praat-Py works by embedding the <a 
-href="http://www.codeplex.com/Wiki/View.aspx?ProjectName=IronPython">IronPython</a> Python engine 
-into Praat, which is a .NET library, and it relies on the <a 
-href="http://www.mono-project.com">Mono</a> .NET runtime externally.  When a script begins
-with the special string "#python" (a Python comment, no less), Praat-Py redirects the script
-from the normal Praat script engine to the Praat-Py engine.  It sends the script off to
-the Mono runtime which invokes IronPython on it, and some additional classes add the glue
-between IronPython and Praat itself.</p>
-
-<p>Here's a diagram of what Praat-Py changes about Praat:</p>
-
-<img src="howitworks.png" style="margin-left: 3em"/>
-
-<p>Why didn't I just link to the standard Python interpreter instead?  It turns out this
-was probably easier.  A sad consequence, though, is that IronPython can't use all of the
-standard Python modules (like random).  So in the future I'll probably revise this to use
-the real Python engine.</p>
 </div>
 
 <h2>Building Praat with Praat-Py from Sources</h2>
@@ -295,19 +197,16 @@ the real Python engine.</p>
 
 <p>Building Praat-Py only works on Linux at the moment.</p>
 
-<p>1) You will need to have Mono installed, the open-source implementation
-of the .NET Framework.  Grab it <a href="http://mono-project.com/Downloads">from here</a>.  (If
-installing from an RPM, you will need the mono-devel package too.  Once it's built, you don't need the devel package.)</p>
+<p>1) You will need to have Python installed, and perhaps the "python-devel" package (or equivalent) for your distribution.</p>
 
-<p>2)  Get <a href="http://www.fon.hum.uva.nl/praat/download_sources.html">the
-Praat sources</a> and follow the instructions to build Praat on
+<p>2)  Get the <a href="http://www.fon.hum.uva.nl/praat/download_sources.html">Praat sources</a> and follow the instructions to build Praat on
 your platform.  (You don't really need to build Praat
 now, but it would be a really good idea to make sure it builds before
 going forward.)</p>
 
-<p>3) In the Praat sources directory (i.e. <tt>sources_4430</tt> or
+<p>3) Inside the Praat sources directory (i.e. <tt>sources_4430</tt> or
 something similar), make a new directory called <tt>scripting</tt>
-and unzip the <a href="dist/praat-py.zip">Praat-Py ZIP package</a> above into that directory.</p>
+and unzip the <a href="dist/praat-py.zip">Praat-Py ZIP package</a> into that directory.</p>
 
 <pre class="code">
 $ mkdir scripting
@@ -319,7 +218,7 @@ $ unzip praat-py.zip
 
 <p>4) The Praat sources must be patched to build Praat-Py and to invoke the
 Python interpreter instead of the Praat script interpreter
-when the script begins with the magic string "#python".  Do this to patch your Praat source files:</p>
+when the script begins with the magic string "#lang=python".  Do this to patch your Praat source files:</p>
 
 <pre class="code">
 $ make patch-praat
@@ -333,7 +232,7 @@ $ make
 </pre>
 
 <p>The <tt>praat</tt> executable in the current directory will
-now be a lot larger, and it will support Python scripts.</p>
+now support Python scripts.</p>
 </div>
 
 	</body>
