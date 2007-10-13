@@ -117,7 +117,7 @@ endfor</pre></td>
 
 <p>The ready-to-go Praat-Py downloads here are currently based on:</p>
 	<div style="margin-left: 2em">
-	<div><b>Praat version 4.5.09 (January 8, 2007)</b></div>
+	<div><b>Praat version 4.6.31 (October 8, 2007)</b></div>
 	<div style="margin: .5em">and</div>
 	<div><b>Praat-Py version 0.5 (October 13, 2007)</b></div>
 	</div>
@@ -152,8 +152,8 @@ print 11500 * 20</pre>
 	<p>The next way is to have Praat do one of its commands on a menu or the main window buttons.  You do this with the <code>go(<i>command</i>, <i>arguments...</i>)</code> function.</p>
 	
 	<pre class="code">#lang=python
-praat.go("To Spectrogram...", .005, maxfreq, .002, 20, "Gaussian")
-praat.go("View")</pre>
+go("To Spectrogram...", .005, maxfreq, .002, 20, "Gaussian")
+go("View")</pre>
 
 	<p>The first argument to the <code>go</code> function is the name of a command on a Praat menu to run.  The remaning arguments are any options that that command takes, in the order that they show up in Praat.
 	You'll notice that as compared to Praat Script, they way you put the arguments
@@ -204,14 +204,25 @@ your platform.  (You don't really need to build Praat
 now, but it would be a really good idea to make sure it builds before
 going forward.)</p>
 
+<p>For instance, on Linux, with the latest version of Praat at the time of writing:</p>
+
+<pre class="code">
+wget http://www.fon.hum.uva.nl/praat/praat4631_sources.tar.gz
+tar -zxf praat4631_sources.tar.gz
+cd sources_4631
+cp makefiles/makefile.defs.linux.dynamic ./makefile.defs
+make
+</pre>
+
 <p>3) Inside the Praat sources directory (i.e. <tt>sources_4430</tt> or
 something similar), make a new directory called <tt>scripting</tt>
 and unzip the <a href="dist/praat-py.zip">Praat-Py ZIP package</a> into that directory.</p>
 
 <pre class="code">
-$ mkdir scripting
-$ cd scripting
-$ unzip praat-py.zip
+mkdir scripting
+cd scripting
+wget http://razor.occams.info/code/praat-py/dist/praat-py.zip
+unzip praat-py.zip
 </pre>
 
 <p>Alternatively, you can check out the SVN module <tt>svn://razor.occams.info/praat-py</tt> <i>as</i> the scripting directory.</p>
@@ -221,14 +232,14 @@ Python interpreter instead of the Praat script interpreter
 when the script begins with the magic string "#lang=python".  Do this to patch your Praat source files:</p>
 
 <pre class="code">
-$ make patch-praat
+make patch-praat
 </pre>
 
 <p>5) Then exit out of the <tt>scripting</tt> directory and build Praat.</p>
 
 <pre class="code">
-$ cd ..
-$ make
+cd ..
+make
 </pre>
 
 <p>The <tt>praat</tt> executable in the current directory will

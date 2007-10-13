@@ -7,14 +7,14 @@
 #include <stdio.h>
 
 #include "../sys/melder.h"
-int praat_executeCommand (void *me, const char *command);
-char * praat_getNameOfSelected (void *voidklas, int inplace);
+int praat_executeCommand (void *interpreter, const wchar_t *command);
+wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);
 
 /* Interface into Praat. */
 
 static void *current_interpreter = NULL; // global state; bad programming style, yes
 
-static char *scripting_praat_executeCommand (const char *command, int divert, int *haderror) {
+static wchar_t *scripting_praat_executeCommand (const wchar_t *command, int divert, int *haderror) {
 	// This runs a Praat Script command already formed in the command
 	// argument. If divert is true, the output to the info window is diverted
 	// and captured, and returned by this function (as a newly-allocated buffer
@@ -22,16 +22,16 @@ static char *scripting_praat_executeCommand (const char *command, int divert, in
 	// error ocurred, and if so the error is returned as a newly allocated
 	// buffer. If no error occurs and divert is false, NULL is returned.
 
-	MelderStringA value = { 0, 0, NULL };
+	MelderString value = { 0, 0, NULL };
 
 	if (divert) Melder_divertInfo (&value);
 	praat_executeCommand (current_interpreter, command);
 	if (divert) Melder_divertInfo (NULL);
 	
 	if (Melder_hasError()) {
-		MelderStringA_free(&value);
+		MelderString_free(&value);
 		*haderror = 1;
-		char *ret = strdup (Melder_getError ());
+		wchar_t *ret = wcsdup (Melder_getError ());
 		Melder_clearError ();
 		return ret;
 	}
@@ -40,11 +40,11 @@ static char *scripting_praat_executeCommand (const char *command, int divert, in
 	
 	if (divert) {
 		if (value.string) {
-			char *ret = strdup (value.string);
-			MelderStringA_free(&value);
+			wchar_t *ret = wcsdup (value.string);
+			MelderString_free(&value);
 			return ret;
 		} else {
-			char *ret = (char*)malloc(1);
+			wchar_t *ret = (wchar_t*)malloc(1);
 			*ret = 0;
 			return ret;
 		}
@@ -55,36 +55,41 @@ static char *scripting_praat_executeCommand (const char *command, int divert, in
 
 /* Make a Praat command from a Python tuple (command name and arguments). */
 
-static int make_command(PyObject *args, char *ret) {
+static int make_command(PyObject *args, wchar_t *ret) {
 	// ret is a buffer allocated by the caller.
 	// TODO: Check buffer overrun.
 
-	char buffer[256];
+	wchar_t buffer[256];
 	int i;
 
-	strcpy(ret, "");
+	wcscpy(ret, L"");
 
 	for (i = 0; i < PyTuple_Size(args); i++) {
-		if (i > 0) strcat(ret, " ");
+		if (i > 0) wcscat(ret, L" ");
 
 		PyObject *elem = PyTuple_GetItem(args, i);
 
 		if (elem == Py_False) {
-			strcpy(buffer, "false");
+			wcscpy(buffer, L"false");
 		} else if (elem == Py_True) {
-			strcpy(buffer, "true");
+			wcscpy(buffer, L"true");
 		} else if (PyInt_Check(elem)) {
 			long x = PyInt_AsLong(elem);
 			if (PyErr_Occurred())
 				return 0;
-			sprintf(buffer, "%ld", x);
+			swprintf(buffer, sizeof(buffer)/sizeof(wchar_t), L"%ld", x);
 		} else if (PyFloat_Check(elem)) {
 			double x = PyFloat_AsDouble(elem);
-			sprintf(buffer, "%g", x);
+			swprintf(buffer, sizeof(buffer)/sizeof(wchar_t), L"%g", x);
 		} else if (PyString_Check(elem)) {
-			strcpy(buffer, PyString_AsString(elem));
+			const char *src = PyString_AsString(elem);
+			if (mbsrtowcs (buffer, &src, sizeof(buffer)/sizeof(wchar_t), NULL) == -1)
+				wcscpy(buffer, L"[wide character conversion failed]");
+		} else if (PyUnicode_Check(elem)) {
+			if (PyUnicode_AsWideChar(elem, buffer, sizeof(buffer)/sizeof(wchar_t)) == -1)
+				wcscpy(buffer, L"[wide character conversion failed]");
 		} else {
-			PyErr_SetString(PyExc_ValueError, "Only Python strings, integers, floats, True, and False can be used as arguments to Praat commands.");
+			PyErr_SetString(PyExc_ValueError, "Only Python strings, integers, floats, True, False, and Unicode strings can be used as arguments to Praat commands.");
 			return 0;
 		}
 
@@ -92,23 +97,23 @@ static int make_command(PyObject *args, char *ret) {
 		// the argument if it contains spaces or quotes.
 		int needs_escape = 0;
 		if (i > 0 && i < PyTuple_Size(args) - 1) {
-			if (strstr(buffer, " ") || strstr(buffer, "\""))
+			if (wcsstr(buffer, L" ") || wcsstr(buffer, L"\""))
 				needs_escape = 1;
 		}
 
 		if (!needs_escape) {
-			strcat(ret, buffer);
+			wcscat(ret, buffer);
 		} else {
-			strcat(ret, "\"");
-			char *r = ret + strlen(ret);
+			wcscat(ret, L"\"");
+			wchar_t *r = ret + wcslen(ret);
 			int i;
-			for (i = 0; i < strlen(buffer); i++) {
+			for (i = 0; i < wcslen(buffer); i++) {
 				*(r++) = buffer[i];
 				if (buffer[i] == '"') // escape quotes by doubling them
 					*(r++) = '"';
 			}
 			*(r++) = 0;
-			strcat(ret, "\"");
+			wcscat(ret, L"\"");
 		}
 	}
 
@@ -117,17 +122,38 @@ static int make_command(PyObject *args, char *ret) {
 		
 /* Python methods in the praat module. */
 
-static char* go_internal(PyObject *args, int captureOutput) {
+char *wc2c(wchar_t *wc, int doFree) {
+	const wchar_t *wc2 = wc;
+	size_t clen = wcslen(wc) * 4;
+	if (clen < 32) clen = 32;
+	char *cret = (char*)malloc(clen);
+	if (wcsrtombs (cret, &wc2, clen, NULL) == -1) {
+		strcpy(cret, "[wide character conversion failed]");
+	}
+	if (doFree) free(wc);
+	return cret;
+}
+
+PyObject *PyWString(wchar_t *wc) {
+	PyObject *ret = PyUnicode_FromWideChar(wc, wcslen(wc));
+	if (!ret)
+		ret = PyString_FromString(wc2c(wc, 1));
+	return ret;
+}
+
+static wchar_t* go_internal(PyObject *args, int captureOutput) {
 	int hadError;
-	char cmd[256];
+	wchar_t cmd[256];
 
 	if (!make_command(args, cmd))
 		return NULL;
 
-	char *ret = scripting_praat_executeCommand(cmd, captureOutput, &hadError);
-
+	wchar_t *ret = scripting_praat_executeCommand(cmd, captureOutput, &hadError);
+	
 	if (hadError) {
-		PyErr_SetString(PyExc_Exception, ret);
+		char *cret = wc2c(ret, 1);
+		PyErr_SetString(PyExc_Exception, cret);
+		free(cret);
 		return NULL;
 	}
 
@@ -142,48 +168,49 @@ static PyObject* extfunc_go(PyObject *self, PyObject *args) {
 }
 
 static PyObject* extfunc_getString(PyObject *self, PyObject *args) {
-	char *ret = go_internal(args, 1);
+	wchar_t *ret = go_internal(args, 1);
 	if (!ret)
 		return NULL;
-	PyObject *ret2 = PyString_FromString(ret);
+	PyObject *ret2 = PyWString(ret);
 	free(ret);
 	return ret2;
 }
 		
 static PyObject* extfunc_getNum(PyObject *self, PyObject *args) {
-	char *ret = go_internal(args, 1);
+	wchar_t *ret = go_internal(args, 1);
 	if (!ret)
 		return NULL;
 
 	float ret2;
-	if (sscanf(ret, "%g", &ret2)) {
+	if (swscanf(ret, L"%g", &ret2)) {
 		free(ret);
 		PyObject *ret3 = PyFloat_FromDouble(ret2);
 		return ret3;
 	} else {
 		char buf[256];
-		sprintf(buf, "No numeric value found in Info window output: %s", ret);
-		free(ret);
+		char *cret = wc2c(ret, 1);
+		sprintf(buf, "No numeric value found in Info window output: %s", cret);
+		free(cret);
 		PyErr_SetString(PyExc_Exception, buf);
 		return NULL;
 	}
 }
 	
 static PyObject *extfunc_select(PyObject *self, PyObject *args) {
-	char command[256];
+	wchar_t command[256];
 	const char *name;
 	int haderror;
 
 	if (!PyArg_ParseTuple(args, "s", &name))
 		return NULL;
 
-	strcpy(command, "select ");
-	strcat(command, name);
+	swprintf(command, sizeof(command)/sizeof(wchar_t), L"select %s", name);
 
-	char *ret = scripting_praat_executeCommand(command, 0, &haderror);
+	wchar_t *ret = scripting_praat_executeCommand(command, 0, &haderror);
 	if (haderror) {
-		PyErr_SetString(PyExc_Exception, ret);
-		free(ret);
+		char *cret = wc2c(ret, 1);
+		PyErr_SetString(PyExc_Exception, cret);
+		free(cret);
 		return NULL;
 	}
 
@@ -194,11 +221,11 @@ static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 	if (!PyArg_ParseTuple(args, ""))
 		return NULL;
 		
-	char *name = praat_getNameOfSelected(NULL, 0);
+	wchar_t *name = praat_getNameOfSelected(NULL, 0);
 	if (name == NULL)
 		return Py_None;
 	
-	return PyString_FromString(name);
+	return PyWString(name);
 }
 
 static PyMethodDef EmbMethods[] = {
@@ -224,12 +251,17 @@ static PyMethodDef EmbMethods[] = {
  * to the info window. */
 
 static PyObject *extfunc_InfoWindowWrite(PyObject *self, PyObject *args) {
-	char *str;
+	const char *str;
+	wchar_t buffer[1024];
 
 	if (!PyArg_ParseTuple(args, "s", &str))
 		return NULL;
 
-	Melder_print (str);
+	memset(buffer, 0, sizeof(buffer));
+	if (mbsrtowcs (buffer, &str, sizeof(buffer)/sizeof(wchar_t), NULL) == -1)
+		wcscpy(buffer, L"[wide character conversion failed]");
+
+	Melder_print (buffer);
 
 	return Py_None;
 }
@@ -310,10 +342,10 @@ static void initModule()  {
 
 /* The main entry point. */
 
-void scripting_run_praat_script(void *interpreter, char *script) {
+void scripting_run_praat_script(void *interpreter, wchar_t *script) {
 	current_interpreter = interpreter;
 
-	if (strncmp(script, "#lang=python", 12) == 0) {
+	if (wcsncmp(script, L"#lang=python", 12) == 0) {
 		// Execute script as a Python script.
 		Py_Initialize();
 		initModule();
@@ -321,10 +353,14 @@ void scripting_run_praat_script(void *interpreter, char *script) {
 		PyRun_SimpleString("import sys");
 		PyRun_SimpleString("sys.stdout = InfoWindow()");
 		PyRun_SimpleString("sys.stderr = InfoWindow()");
-		PyRun_SimpleString(script);
+		
+		char *cscript = wc2c(script, 0);
+		PyRun_SimpleString(cscript);
+		free(cscript);
+		
 		Py_Finalize();
 	} else {
-		Melder_print ("Unrecognized language in #lang= line in script. Use \"#lang=python\".\n");
+		Melder_print (L"Unrecognized language in #lang= line in script. Use \"#lang=python\".\n");
 	}
 
 	current_interpreter = NULL;
