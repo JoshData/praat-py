@@ -25,7 +25,7 @@ language, rather than in Praat's built-in language.</p>
 learn an entirely new programming language if they already know Python.
 Additionally, Python is a more complete programming language and so scripts of any complexity should be
 more easily written in Python. The goal isn't to make all scripts easier or shorter to write, but
-it make it possible to do some tasks more easily.</p>
+to make it possible to do some tasks more easily.</p>
 
 <p>All of the functionality of Praat's scripting language is (meant to) be retained
 when using Python.  However, forms are not implemented yet. Likewise, because
@@ -60,7 +60,7 @@ by Mietta Lennes.</p>
 <pre>#lang=python
 from glob import glob
 
-aiffdir = "/home/tauberer/my-aif-files/"
+aiffdir = "/path/to/my-aif-files/"
 delete_AIFF_files_after_conversion = False
 
 for file in glob(aiffdir + "*.aif") :
@@ -119,7 +119,7 @@ endfor</pre></td>
 	<div style="margin-left: 2em">
 	<div><b>Praat version 4.5.09 (January 8, 2007)</b></div>
 	<div style="margin: .5em">and</div>
-	<div><b>Praat-Py version 0.1 (January 11, 2007)</b></div>
+	<div><b>Praat-Py version 0.5 (October 13, 2007)</b></div>
 	</div>
 
 <dl>
@@ -186,7 +186,7 @@ print selected() # prints "Sound mysound"</pre>
 
 <h2>Limitations</h2>
 <div class="section">
-<p>Praat forms not implemented</p>
+<p>Praat forms are not implemented</p>
 <p>I don't know how to build Praat on Windows, so there's no Windows version</p>
 <p>It would be nice to be able to manipulate Praat from an externally running script, too</p>
 <p>Can we get some or all of this integrated into the main Praat distribution?</p>
