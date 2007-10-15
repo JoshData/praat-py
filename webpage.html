@@ -25,7 +25,7 @@ language, rather than in Praat's built-in language.</p>
 learn an entirely new programming language if they already know Python.
 Additionally, Python is a more complete programming language and so scripts of any complexity should be
 more easily written in Python. The goal isn't to make all scripts easier or shorter to write, but
-to make it possible to do some tasks more easily.</p>
+to make it possible to do some complex tasks more easily.</p>
 
 <p>All of the functionality of Praat's scripting language is (meant to) be retained
 when using Python.  However, forms are not implemented yet. Likewise, because
@@ -137,6 +137,7 @@ endfor</pre></td>
 
 <h3>Using Python in Praat-Py</h3>
 <div class="section">
+	<h4>Starting a Praat-Py Script</h4>
 
 	<p>Once you have Praat-Py, you can write scripts in Python rather than Praat's own scripting language.  You should be roughly familiar with Praat scripting before reading on (see <a href="http://www.fon.hum.uva.nl/praat/manual/Scripting.html">this page</a>).  To script with Python, all you have to do is start your scripts with this:</p>
 	
@@ -144,6 +145,8 @@ endfor</pre></td>
 	
 	<p>That is, the very first line of your script must be a hash (#) followed immediately by "lang=python" in lowercase letters.  This instructs Praat to interpret the remainder of your script as Python code.</p>
 	
+	<h4>New Python Functions for Praat</h4>
+
 	<p>There are several ways your Python script can make Praat do things.  The first way is via the <code>print</code> Python command, which will output a string to the Praat Info window:</p>
 
 	<pre class="code">#lang=python
@@ -181,6 +184,17 @@ print "The end time is: ", getString("Get end time")</pre>
 	<pre class="code">#lang=python
 select("Sound mysound")
 print selected() # prints "Sound mysound"</pre>
+
+	<p>(These new commands are defined in the <code>praat</code> module and are automatically imported.)</p>
+	
+	<h4>Running the Script from the Command Line</h4>
+	
+	<p>As with Praat Scripts normally, you can run a script from the command-line directly (and never see Praat itself),
+	besides running it from a script window.
+	Say "myscript.praatpy" is a Praat-Py script, i.e. a Python program
+	beginning with "#lang=python". You can then run it as:</p>
+	
+	<pre class="code">praat myscript.praatpy</pre>
 </div>
 
 
