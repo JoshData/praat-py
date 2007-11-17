@@ -2,7 +2,7 @@
 	<head>
 		<title>Praat-Py: Extended Praat for Python Scripting</title>
 		<style>
-			.section { margin-left: 2em }
+			.sec { margin-left: 2em }
 			.code { background-color: #EFEFEF; padding: .5em; border: 1px solid #DDDDDD; }
 			code { font-weight: bold; font-size: 110%; letter-spacing: .33px; }
 		</style>
@@ -15,8 +15,8 @@
 <p>By Joshua Tauberer &lt;<a href="http://razor.occams.info">http://razor.occams.info</a>&gt;</p>
 
 <h2>Introduction</h2>
-<div class="section">
-<p>This project is an extension to <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
+<div class="sec">
+<p>Praat-Py (or lovingly also called PyPraat, or maybe even PraatPy without the dash) is an extension to <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
 the computer program used by linguists for doing phonetic analysis on sound files,
 to allow for scripts to be written in the Python programming
 language, rather than in Praat's built-in language.</p>
@@ -44,7 +44,7 @@ as well, i.e. the python-devel package or the like).</p>
 <h2>Examples</h2>
 
 
-<div class="section">
+<div class="sec">
 <p>The following is an example script for Praat written in Python,
 and on the right is the corresponding script in Praat Script.
 The script converts all .aif files in a directory into .wav format, resamping them in
@@ -110,7 +110,7 @@ endfor</pre></td>
 <h2>Getting Started</h2>
 
 <h3>Downloading Praat-Py</h3>
-<div class="section">
+<div class="sec">
 <p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain operating systems (i.e. Linux) because that is what I have available to create it for.</p>
 
 <p>You will need to have <a href="http://www.python.org">Python</a> 2.5 or later installed. (Maybe it works with earlier Pythons. I haven't tried.)</p>
@@ -136,7 +136,7 @@ endfor</pre></td>
 
 
 <h3>Using Python in Praat-Py</h3>
-<div class="section">
+<div class="sec">
 	<h4>Starting a Praat-Py Script</h4>
 
 	<p>Once you have Praat-Py, you can write scripts in Python rather than Praat's own scripting language.  You should be roughly familiar with Praat scripting before reading on (see <a href="http://www.fon.hum.uva.nl/praat/manual/Scripting.html">this page</a>).  To script with Python, all you have to do is start your scripts with this:</p>
@@ -199,7 +199,7 @@ print selected() # prints "Sound mysound"</pre>
 
 
 <h2>Limitations</h2>
-<div class="section">
+<div class="sec">
 <p>Praat forms are not implemented</p>
 <p>I don't know how to build Praat on Windows, so there's no Windows version</p>
 <p>It would be nice to be able to manipulate Praat from an externally running script, too</p>
@@ -207,7 +207,7 @@ print selected() # prints "Sound mysound"</pre>
 </div>
 
 <h2>Building Praat with Praat-Py from Sources</h2>
-<div class="section">
+<div class="sec">
 
 <p>Building Praat-Py only works on Linux at the moment.</p>
 
