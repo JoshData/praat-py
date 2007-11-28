@@ -1,5 +1,4 @@
-// This file is the glue between Praat's script interpreter
-// and external script interpreters like Python.
+// This file handles Python scripting for Praat.
 
 #include <Python.h>
 #include <structmember.h>
@@ -127,31 +126,82 @@ static PyObject* extfunc_getNum(PyObject *self, PyObject *args) {
 	}
 }
 	
-static PyObject *extfunc_select(PyObject *self, PyObject *args) {
+static PyObject *extfunc_do_select(PyObject *self, PyObject *args, int mode) {
 	wchar_t** command;
-	const char *name;
+	const char *type, *name;
 	int haderror;
-
-	if (!PyArg_ParseTuple(args, "s", &name))
-		return NULL;
-
-	command = (wchar_t**)calloc(3, sizeof(wchar_t*));
-	command[0] = wcsdup(L"select");
-	command[1] = (wchar_t*)calloc(strlen(name)+1, sizeof(wchar_t));
-	command[2] = NULL;
+	int i;
 	
-	swprintf(command[1], (strlen(name)+1)*sizeof(wchar_t), L"%s", name);
-
-	wchar_t *ret = scripting_executePraatCommand(command, 0, &haderror);
-	if (haderror) {
-		char *cret = wc2c(ret, 1);
-		PyErr_SetString(PyExc_Exception, cret);
-		free(cret);
+	// This accepts a variable number of arguments.
+	
+	if (PyTuple_Size(args) == 0) {
+		PyErr_SetString(PyExc_ValueError, "You must pass at least one Praat object name to the select method.");
 		return NULL;
+	}
+	
+	for (i = 0; i < PyTuple_Size(args); i++) {
+		PyObject *item = PyTuple_GetItem(args, i);
+		
+		// If it is a string, it is an object type and name together.
+		if (PyString_Check(item)) {
+			type = NULL;
+			name = PyString_AsString(item);
+			
+		// If it is a tuple of length two, it has (type, name)
+		} else if (PyTuple_Check(item) && PyTuple_Size(item) == 2) {
+			if (!PyArg_ParseTuple(item, "ss", &type, &name)) 
+				return NULL;
+
+		} else {
+			PyErr_SetString(PyExc_ValueError, "Arguments to select must be strings like 'LongSound mysound' or tuples like ('LongSound', 'mysound').");
+			return NULL;
+		}
+		
+		command = (wchar_t**)calloc(4, sizeof(wchar_t*));		
+		
+
+		if (i == 0 && mode == 0)
+			command[0] = wcsdup(L"select");
+		else if (mode == 0 || mode == 1)
+			command[0] = wcsdup(L"plus");
+		else if (mode == 2)
+			command[0] = wcsdup(L"minus");
+
+		if (type == NULL) {
+			command[1] = (wchar_t*)calloc(strlen(name)+1, sizeof(wchar_t));
+			command[2] = NULL;
+			swprintf(command[1], (strlen(name)+1)*sizeof(wchar_t), L"%s", name);
+		} else {
+			command[1] = (wchar_t*)calloc(strlen(type)+1, sizeof(wchar_t));
+			command[2] = (wchar_t*)calloc(strlen(name)+1, sizeof(wchar_t));
+			command[3] = NULL;
+			swprintf(command[1], (strlen(type)+1)*sizeof(wchar_t), L"%s", type);
+			swprintf(command[2], (strlen(name)+1)*sizeof(wchar_t), L"%s", name);
+		}
+
+		wchar_t *ret = scripting_executePraatCommand(command, 0, &haderror);
+		if (haderror) {
+			char *cret = wc2c(ret, 1);
+			PyErr_SetString(PyExc_Exception, cret);
+			free(cret);
+			return NULL;
+		}
 	}
 
 	Py_INCREF(Py_None);
 	return Py_None;
+}
+
+static PyObject *extfunc_select(PyObject *self, PyObject *args) {
+	return extfunc_do_select(self, args, 0);
+}
+
+static PyObject *extfunc_plus(PyObject *self, PyObject *args) {
+	return extfunc_do_select(self, args, 1);
+}
+
+static PyObject *extfunc_minus(PyObject *self, PyObject *args) {
+	return extfunc_do_select(self, args, 2);
 }
 
 static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
@@ -163,8 +213,21 @@ static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 		Py_INCREF(Py_None);
 		return Py_None;
 	}
+
+	char *name2 = wc2c(name, 0);
 	
-	return PyWString(name);
+	char *space = strstr(name2, " ");
+	if (space == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	
+	*space = 0; // split into two strings
+	
+	PyObject* ret = PyTuple_New(2);
+	PyTuple_SetItem(ret, 0, PyString_FromString(name2));
+	PyTuple_SetItem(ret, 1, PyString_FromString(strdup(space+1)));
+	return ret;
 }
 
 static PyMethodDef EmbMethods[] = {
@@ -178,10 +241,16 @@ static PyMethodDef EmbMethods[] = {
      "Executes a Praat command returning the Info window output as a float."},
 
     {"select", extfunc_select, METH_VARARGS,
-     "Selects the Praat object of the given name."},
+     "Selects the Praat object (or multiple objects). Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
 
-    {"selected", extfunc_selected, METH_VARARGS,
-     "Returns the name of the selected Praat object."},
+    {"plus", extfunc_plus, METH_VARARGS,
+     "Adds the Praat object (or multiple objects) to the current selection. Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
+
+    {"minus", extfunc_minus, METH_VARARGS,
+     "Deselects the Praat object (or multiple objects). Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
+
+     {"selected", extfunc_selected, METH_VARARGS,
+     "Returns the type and name of the selected Praat object, e.g. (type, name) = selected()."},
 
     {NULL, NULL, 0, NULL}
 };
