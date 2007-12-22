@@ -13,11 +13,11 @@ sendpraat: ../sys/sendpraat.c
 
 patch-praat:
 	perl patch.pl ../makefile "cd artsynth; make" "\tcd scripting; make"
-	perl patch.pl ../makefile "sys/libsys.a GSL/libgsl.a kar/libkar.a FLAC/libFLAC.a mp3/libmp3.a \\" "\t\tscripting/scripting.o scripting/python.o \`python2.5-config --ldflags\` `echo -e \"import distutils.sysconfig\nprint distutils.sysconfig.get_config_var('LINKFORSHARED')\" | python` \\"
+	perl patch.pl ../makefile "sys/libsys.a GSL/libgsl.a kar/libkar.a FLAC/libFLAC.a mp3/libmp3.a \\" "\t\tscripting/scripting.o scripting/python.o `python2.5-config --ldflags` `python -c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('LINKFORSHARED')\"` \\"
 	perl patch.pl ../sys/Interpreter.c "#include \"Formula.h\"" "#include \"../scripting/scripting.h\""
 	perl patch.pl ../sys/Interpreter.c "int Interpreter_run (Interpreter me, wchar_t *text) {" \
 		"\tif (scripting_run_praat_script(me, text))\n\t\treturn 1;"
-	perl patch.pl --replace ../sys/sendpraat.c "#if 0" "#if STANDALONE"
+	#perl patch.pl --replace ../sys/sendpraat.c "#if 0" "#if STANDALONE"
 
 dist/praat-py.zip: $(DISTFILES)
 	rm -f dist/praat-py.zip

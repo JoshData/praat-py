@@ -33,6 +33,10 @@ while (scalar(@ARGV)) {
 	}
 }
 
+if (!-e "$file.bak") {
+	system("mv $file $file.bak");
+}
+
 open OUT, ">$file";
 print OUT $in;
 close OUT;

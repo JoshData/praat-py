@@ -1,3 +1,15 @@
+2007-12-22 Version 0.502
+
+	* Revised the build process to be more Linux-neutral, and other
+	  minor things.
+	  patch.pl: Create a .bak backup file before making changes
+	  to patch files.
+	  Makefile: Insert python-config options directly, rather than
+	  inserting backticks into the makefile.
+	  Makefile: Don't use echo -e, since -e seems not to be universal.
+	  Makefile: Don't patch sendpraat since we don't need it, and if
+	  it's already been patched, we print a spurrious warning.
+
 2007-11-28 Version 0.501
 
 	* Changed the behavior of the selection functions
