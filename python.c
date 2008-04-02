@@ -357,6 +357,7 @@ void scripting_run_python(wchar_t *script) {
 	PyRun_SimpleString("import sys");
 	PyRun_SimpleString("sys.stdout = InfoWindow()");
 	PyRun_SimpleString("sys.stderr = InfoWindow()");
+	PyRun_SimpleString("sys.path = ['.'] + sys.path");
 		
 	char *cscript = wc2c(script, 0);
 	PyRun_SimpleString(cscript);
