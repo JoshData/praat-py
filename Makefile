@@ -1,19 +1,29 @@
 DISTFILES=README Makefile \
-		scripting.c scripting.h python.c \
+		scripting.c scripting.h python.c util.c util.h \
 		patch.pl
 
-all: scripting.o #sendpraat
+CCOPTS=-g -std=c99
 
-scripting.o: scripting.c scripting.h python.c
-	gcc -g -c scripting.c -o scripting.o
-	gcc -g -c python.c -o python.o `python2.5-config --cflags`
+all: scripting.o python.o util.o #sendpraat
+
+clean:
+	rm *.o
+
+scripting.o: scripting.c scripting.h
+	gcc $(CCOPTS) -c scripting.c -o scripting.o
+	
+python.o: python.c
+	gcc $(CCOPTS) -c python.c -o python.o `python2.5-config --cflags`
+
+util.o: util.c util.h
+	gcc $(CCOPTS) -c util.c -o util.o
 
 sendpraat: ../sys/sendpraat.c
-	gcc -g -o sendpraat ../sys/sendpraat.c -DSTANDALONE -lXm
+	gcc $(CCOPTS) -o sendpraat ../sys/sendpraat.c -DSTANDALONE -lXm
 
 patch-praat:
 	perl patch.pl ../makefile "cd artsynth; make" "\tcd scripting; make"
-	perl patch.pl ../makefile "audio/libaudio.a FLAC/libFLAC.a mp3/libmp3.a \\" "\t\tscripting/scripting.o scripting/python.o `python2.5-config --ldflags` `python -c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('LINKFORSHARED')\"` \\"
+	perl patch.pl ../makefile "sys/libsys.a GSL/libgsl.a kar/libkar.a FLAC/libFLAC.a mp3/libmp3.a \\" "\t\tscripting/scripting.o scripting/python.o scripting/util.o `python2.5-config --ldflags` `python -c \"import distutils.sysconfig; print distutils.sysconfig.get_config_var('LINKFORSHARED')\"` \\"
 	perl patch.pl ../sys/Interpreter.c "#include \"Formula.h\"" "#include \"../scripting/scripting.h\""
 	perl patch.pl ../sys/Interpreter.c "int Interpreter_run (Interpreter me, wchar_t *text) {" \
 		"\tif (scripting_run_praat_script(me, text))\n\t\treturn 1;"

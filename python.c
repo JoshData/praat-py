@@ -1,11 +1,13 @@
 // This file handles Python scripting for Praat.
 
+#include <stdio.h>
+#include <wchar.h>
+
 #include <Python.h>
 #include <structmember.h>
 
+#include "util.h"
 #include "scripting.h"
-
-#include <stdio.h>
 
 #include "../sys/melder.h"
 wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);

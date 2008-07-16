@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <wchar.h>
 
+#include "util.h"
 #include "scripting.h"
 
 #include "../sys/melder.h"
