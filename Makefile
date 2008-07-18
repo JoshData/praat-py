@@ -1,10 +1,11 @@
 DISTFILES=README Makefile \
 		scripting.c scripting.h python.c util.c util.h \
+		sendpraat_main.c \
 		patch.pl
 
 CCOPTS=-g -std=c99
 
-all: scripting.o python.o util.o #sendpraat
+all: scripting.o python.o util.o sendpraat
 
 clean:
 	rm *.o
@@ -18,8 +19,8 @@ python.o: python.c
 util.o: util.c util.h
 	gcc $(CCOPTS) -c util.c -o util.o
 
-sendpraat: ../sys/sendpraat.c
-	gcc $(CCOPTS) -o sendpraat ../sys/sendpraat.c -DSTANDALONE -lXm
+sendpraat: ../sys/sendpraat.c sendpraat_main.c
+	gcc $(CCOPTS) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
 
 patch-praat:
 	perl patch.pl ../makefile "cd artsynth; make" "\tcd scripting; make"
