@@ -16,7 +16,7 @@
 
 <h2>Introduction</h2>
 <div class="sec">
-<p>Praat-Py (or lovingly also called PyPraat, or maybe even PraatPy without the dash) is an extension to <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
+<p>Praat-Py (or lovingly also called PyPraat, but not PraatPy without the dash) is an extension to <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
 the computer program used by linguists for doing phonetic analysis on sound files,
 to allow for scripts to be written in the Python programming
 language, rather than in Praat's built-in language.</p>
@@ -39,6 +39,16 @@ the GPL v2 or later.</p>
 compile Praat-Py from sources yourself, which means you are probably on a Linux or Mac OSX
 computer. In that case, you must have Python installed (and possibly development files
 as well, i.e. the python-devel package or the like).</p>
+
+<table>
+<tr>
+<td style="padding: 2em; font-size: 120%"><i>
+Praat Scripting: Do you want to script better than this?
+</i></td>
+<td><img src="photo.jpg"/></td>
+</tr>
+</table>
+
 </div>
 
 <h2>Examples</h2>
@@ -124,7 +134,7 @@ endfor</pre></td>
 
 <dl>
 <dt>Pre-made (Binary) Downloads:</dt>
-<dd>Linux Fedora Core 7/i386/32bit Download: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></dd>
+<dd>Linux Unbuntu 8.10/i386/32bit Download: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></dd>
 <dd>That's it. Sorry!</dd>
 </dl>
 
@@ -146,13 +156,14 @@ endfor</pre></td>
 <div class="sec">
 	<h4>Starting a Praat-Py Script</h4>
 
-	<p>Once you have Praat-Py, you can write scripts in Python rather than Praat's own scripting language.  You should be roughly familiar with Praat scripting before reading on (see <a href="http://www.fon.hum.uva.nl/praat/manual/Scripting.html">this page</a>).  To script with Python, all you have to do is start your scripts with this:</p>
+	<p>Once you have Praat-Py, you can write scripts in either Praat's built-in scripting language or in Python.  You should be roughly familiar with Praat scripting before reading on (see <a href="http://www.fon.hum.uva.nl/praat/manual/Scripting.html">this page</a>), as well as <a href="http://www.python.org/">Python</a>.  To script with Python, all you have to do is start your scripts with this:</p>
 	
 	<pre class="code">#lang=python</pre>
 	
-	<p>That is, the very first line of your script must be a hash (#) followed immediately by "lang=python" in lowercase letters.  This instructs Praat to interpret the remainder of your script as Python code.</p>
+	<p>That is, the very first line of your script must be a hash (#) followed immediately by "lang=python" in lowercase letters.  This instructs Praat to interpret the remainder of your script as Python code.
+	Without this special line, the script is run as a normal Praat script.</p>
 	
-	<h4>"Go" Functions</h4>
+	<h4>"Print" and "Go" Functions</h4>
 
 	<p>There are several ways your Python script can make Praat do things.  The first way is via the <code>print</code> Python command, which will output a string to the Praat Info window:</p>
 
@@ -192,7 +203,7 @@ print "The end time is: ", getString("Get end time")</pre>
 	<pre class="code">#lang=python
 select("Sound mysound") # selects just a sound
 select("Sound mysound", "TextGrid mysound") # selects these two together (and unselects everything else)
-select( ("Sound", "mysound") ) # same as above, might be useful in some cases
+select( ("Sound", "mysound") ) # same as above, might be useful in some cases, note the double parens!
 select( ("Sound", "mysound"), ("TextGrid", "mysound") ) # same as above</pre>
 	
 	<p>To add or remove objects from the selection, use <code>plus</code> and <code>minus</code> as in Praat scripting.
@@ -213,6 +224,8 @@ select("Sound mysound")
 
 s = selected()
 print s # prints "('Sound', 'MySound')"
+print s[0] # prints the type of the object, "Sound"
+print s[1] # prints the name of the object, "MySound"
 minus(s) # deselects the currently selected object</pre>
 
 	<p>(These new commands are defined in the <code>praat</code> module and are automatically imported.)</p>
