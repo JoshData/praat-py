@@ -127,14 +127,14 @@ char *wc2c(wchar_t *wc, int doFree) {
 
 /* The main entry point. */
 
-int scripting_run_praat_script(void *interpreter, wchar_t *script) {
+int scripting_run_praat_script(void *interpreter, wchar_t *script, wchar_t **argv) {
 	if (wcsncmp(script, L"#lang=", 6) != 0)
 		return 0;
 
 	current_interpreter = interpreter;
 
 	if (wcsncmp(script, L"#lang=python", 12) == 0) {
-		scripting_run_python(script);
+		scripting_run_python(script, argv);
 	} else {
 		Melder_print (L"Unrecognized language in #lang= line in script. Use \"#lang=python\".\n");
 	}

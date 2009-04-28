@@ -12,6 +12,8 @@
 #include "../sys/melder.h"
 wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);
 
+static wchar_t **global_argv;
+
 /* Turn a Python tuple into a wchar_t list of the command and arguments. */
 
 static wchar_t ** make_command(PyObject *args) {
@@ -232,6 +234,17 @@ static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 	return ret;
 }
 
+static PyObject *extfunc_argv(PyObject *self, PyObject *args) {
+	if (!PyArg_ParseTuple(args, ""))
+		return NULL;
+	
+	PyObject* ret = PyList_New(0);
+	for (int i = 0; global_argv[i]; i++)
+		PyList_Append(ret, PyWString(global_argv[i]));
+		
+	return ret;
+}
+
 static PyMethodDef EmbMethods[] = {
     {"go", extfunc_go, METH_VARARGS,
      "Executes a Praat command, with output going to the Info window."},
@@ -251,8 +264,11 @@ static PyMethodDef EmbMethods[] = {
     {"minus", extfunc_minus, METH_VARARGS,
      "Deselects the Praat object (or multiple objects). Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
 
-     {"selected", extfunc_selected, METH_VARARGS,
+    {"selected", extfunc_selected, METH_VARARGS,
      "Returns the type and name of the selected Praat object, e.g. (type, name) = selected()."},
+
+    {"getargv", extfunc_argv, METH_VARARGS,
+     "Returns a list of the command-line arguments, including the script name itself as the first item in the list."},
 
     {NULL, NULL, 0, NULL}
 };
@@ -351,10 +367,13 @@ static void initModule()  {
     PyModule_AddObject(m, "InfoWindow", (PyObject *)&praatpy_InfoWindowStreamObj);
 }
 
-void scripting_run_python(wchar_t *script) {
+void scripting_run_python(wchar_t *script, wchar_t **argv) {
 	// Execute script as a Python script.
+	global_argv = argv;
 	Py_Initialize();
 	initModule();
+	PyRun_SimpleString("import praat");
+	PyRun_SimpleString("praat.argv = praat.getargv()");
 	PyRun_SimpleString("from praat import *");
 	PyRun_SimpleString("import sys");
 	PyRun_SimpleString("sys.stdout = InfoWindow()");
