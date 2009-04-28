@@ -123,24 +123,17 @@ endfor</pre></td>
 <div class="sec">
 <p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain operating systems (i.e. Linux) because that is what I have available to create it for.</p>
 
-<p>You will need to have <a href="http://www.python.org">Python</a> 2.5 or later installed. (Maybe it works with earlier Pythons. I haven't tried.)</p>
+<p>Here are some ready-to-go Praat-Py downloads:</p>
+<div style="margin-left: 2em">
+	<div>Based on <b>Praat v5.1.04 (April 4, 2009)</b>
+	and
+	<b>Praat-Py v0.6 (April 28, 2009)</b></div>
 
-<p>The ready-to-go Praat-Py downloads here are currently based on:</p>
-	<div style="margin-left: 2em">
-	<div><b>Praat version 5.1.02 (March 9, 2009)</b></div>
-	<div style="margin: .5em">and</div>
-	<div><b>Praat-Py version 0.503 (April 5, 2009)</b></div>
-	</div>
+	<p>Ubuntu Linux 9.04, i386/32bit (Python 2.6): <a href="dist/praat-py_ubuntu_jaunty">Download</a></p>
+	<p>Ubuntu Linux 8.10, i386/32bit (Python 2.4): <a href="dist/praat-py_ubuntu_gustyy">Download</a></p>
+</div>
 
-<dl>
-<dt>Pre-made (Binary) Downloads:</dt>
-<dd>Linux Unbuntu 8.10/i386/32bit Download: <a href="dist/praat-py_linux_i386">praat-py_linux_i386</a></dd>
-<dd>That's it. Sorry!</dd>
-</dl>
-
-<!--<p>Windows: <a href="dist/praat-py.exe">praat-py.exe</a></p>-->
-
-<p>If none of these downloads are useful to you, you will need to build Praat-Py from its source files.  (Experienced users only.)  Instructions are below.</p>
+<p>If these downloads are not useful to you, you will need to build Praat-Py from its source files.  (Experienced users only!)  Instructions are below.</p>
 
 <p>You can also...</p>
 <ul>
@@ -238,11 +231,20 @@ minus(s) # deselects the currently selected object</pre>
 	beginning with "#lang=python". You can then run it as:</p>
 	
 	<pre class="code">praat myscript.praatpy</pre>
+	
+	<p>You can also pass command-line parameters to the script:</p>
+
+	<pre class="code">praat myscript.praatpy arg1 arg2</pre>
+	
+	<p>...and access them with <code>argv</code> As with the usual Python sys.argv list, the first element in this list is the name of the script itself.</p>
+
+	<pre class="code">#lang=python
+print argv     # this prints [u'myscript.praatpy', u'arg1', u'arg2']  (they're Unicode strings, assumed UTF-8 on command line)</pre>
 </div>
 
 
 <h2>Limitations</h2>
-<div class="sec">
+<div class="sec	">
 <p>Praat forms are not implemented</p>
 <p>I don't know how to build Praat on Windows, so there's no Windows version</p>
 <p>It would be nice to be able to manipulate Praat from an externally running script, too</p>
@@ -264,9 +266,9 @@ going forward.)</p>
 <p>For instance, on Linux, with the latest version of Praat at the time of writing:</p>
 
 <pre class="code">
-wget http://www.fon.hum.uva.nl/praat/praat4631_sources.tar.gz
-tar -zxf praat4631_sources.tar.gz
-cd sources_4631
+wget http://www.fon.hum.uva.nl/praat/praat5104_sources.tar.gz
+tar -zxf praat5104_sources.tar.gz
+cd sources_5104
 cp makefiles/makefile.defs.linux.dynamic ./makefile.defs
 make
 </pre>

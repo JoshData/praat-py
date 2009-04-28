@@ -1,4 +1,10 @@
-2009-04-05 Version 5.03
+2009-04-28 Version 0.6
+
+	* Access command-line arguments from within the script with praat.argv or just argv.
+	* Simplified the way we patch Praat.
+	* Update for Praat 5.1.04.
+
+2009-04-05 Version 0.503
 
 	* Build update for latest version of Praat.
 
