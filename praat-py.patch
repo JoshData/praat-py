@@ -11,7 +11,7 @@ diff -ur -x '*.[oa]' ../../sources_5102/dwsys/NUMcblas.c ../dwsys/NUMcblas.c
  
 diff -ur -x '*.[oa]' ../../sources_5102/makefile ../makefile
 --- ../../sources_5102/makefile	2009-02-27 05:32:36.000000000 -0500
-+++ ../makefile	2009-04-28 08:43:46.000000000 -0400
++++ ../makefile	2009-04-28 09:30:27.000000000 -0400
 @@ -27,6 +27,7 @@
  	cd gram; make
  	cd FFNet; make
@@ -24,7 +24,7 @@ diff -ur -x '*.[oa]' ../../sources_5102/makefile ../makefile
  		artsynth/libartsynth.a fon/libfon.a stat/libstat.a dwsys/libdwsys.a \
  		sys/libsys.a num/libnum.a GSL/libgsl.a num/glpk/libglpk.a kar/libkar.a \
  		audio/libaudio.a FLAC/libFLAC.a mp3/libmp3.a contrib/ola/libOla.a \
-+		scripting/scripting.o scripting/python.o scripting/util.o -L/usr/lib/python2.6/config -lpthread -ldl -lutil -lm -lpython2.6 -Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions \
++		scripting/scripting.o scripting/python.o scripting/util.o `python-config --ldflags` \
  		$(LIBS)
 diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.c ../sys/Interpreter.c
 --- ../../sources_5102/sys/Interpreter.c	2009-01-20 19:12:55.000000000 -0500

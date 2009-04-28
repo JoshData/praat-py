@@ -14,7 +14,7 @@ scripting.o: scripting.c scripting.h
 	gcc $(CCOPTS) -c scripting.c -o scripting.o
 	
 python.o: python.c
-	gcc $(CCOPTS) -c python.c -o python.o `python2.6-config --cflags`
+	gcc $(CCOPTS) -c python.c -o python.o `python-config --cflags`
 
 util.o: util.c util.h
 	gcc $(CCOPTS) -c util.c -o util.o
