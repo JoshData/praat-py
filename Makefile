@@ -23,7 +23,7 @@ sendpraat: ../sys/sendpraat.c sendpraat_main.c
 	gcc $(CCOPTS) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
 
 praat-py.patch:
-	diff -ur -x "*.[oa]" ../../sources_5102/ ..|grep -v "Only in .." > praat-py.patch
+	diff -ur -x "*.[oa]" ../../sources_5104/ ..|grep -v "Only in .." > praat-py.patch
 
 patch-praat:
 	patch -p0 < praat-py.patch

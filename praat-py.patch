@@ -1,6 +1,6 @@
-diff -ur -x '*.[oa]' ../../sources_5102/dwsys/NUMcblas.c ../dwsys/NUMcblas.c
---- ../../sources_5102/dwsys/NUMcblas.c	2007-11-30 18:21:29.000000000 -0500
-+++ ../dwsys/NUMcblas.c	2009-03-18 10:04:43.000000000 -0400
+diff -ur -x '*.[oa]' ../../sources_5104/dwsys/NUMcblas.c ../dwsys/NUMcblas.c
+--- ../../sources_5104/dwsys/NUMcblas.c	2007-11-30 18:21:29.000000000 -0500
++++ ../dwsys/NUMcblas.c	2009-04-28 09:44:25.000000000 -0400
 @@ -1443,6 +1443,7 @@
  	double ret_val;
  
@@ -9,9 +9,9 @@ diff -ur -x '*.[oa]' ../../sources_5102/dwsys/NUMcblas.c ../dwsys/NUMcblas.c
  	return ret_val;
  }								/* dlamc3_ */
  
-diff -ur -x '*.[oa]' ../../sources_5102/makefile ../makefile
---- ../../sources_5102/makefile	2009-02-27 05:32:36.000000000 -0500
-+++ ../makefile	2009-04-28 09:30:27.000000000 -0400
+diff -ur -x '*.[oa]' ../../sources_5104/makefile ../makefile
+--- ../../sources_5104/makefile	2009-02-27 05:32:36.000000000 -0500
++++ ../makefile	2009-04-28 09:44:25.000000000 -0400
 @@ -27,6 +27,7 @@
  	cd gram; make
  	cd FFNet; make
@@ -26,10 +26,10 @@ diff -ur -x '*.[oa]' ../../sources_5102/makefile ../makefile
  		audio/libaudio.a FLAC/libFLAC.a mp3/libmp3.a contrib/ola/libOla.a \
 +		scripting/scripting.o scripting/python.o scripting/util.o `python-config --ldflags` \
  		$(LIBS)
-diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.c ../sys/Interpreter.c
---- ../../sources_5102/sys/Interpreter.c	2009-01-20 19:12:55.000000000 -0500
-+++ ../sys/Interpreter.c	2009-04-28 08:32:35.000000000 -0400
-@@ -55,6 +55,7 @@
+diff -ur -x '*.[oa]' ../../sources_5104/sys/Interpreter.c ../sys/Interpreter.c
+--- ../../sources_5104/sys/Interpreter.c	2009-03-17 16:24:54.000000000 -0400
++++ ../sys/Interpreter.c	2009-04-28 09:44:25.000000000 -0400
+@@ -56,6 +56,7 @@
  extern structMelderDir praatDir;
  #include "praat_script.h"
  #include "Formula.h"
@@ -37,7 +37,7 @@ diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.c ../sys/Interpreter.c
  #include "praat_version.h"
  
  #define Interpreter_WORD 1
-@@ -194,6 +195,10 @@
+@@ -195,6 +196,10 @@
  	return 1;
  }
  
@@ -48,7 +48,7 @@ diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.c ../sys/Interpreter.c
  int Interpreter_readParameters (Interpreter me, wchar_t *text) {
  	wchar_t *formLocation = NULL;
  	int npar = 0;
-@@ -628,6 +633,8 @@
+@@ -629,6 +634,8 @@
  }
  
  int Interpreter_run (Interpreter me, wchar_t *text) {
@@ -57,9 +57,9 @@ diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.c ../sys/Interpreter.c
  	static MelderString valueString = { 0 };   /* To divert the info. */
  	static MelderString assertErrorString = { 0 };
  	wchar_t *command = text;
-diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.h ../sys/Interpreter.h
---- ../../sources_5102/sys/Interpreter.h	2009-01-20 16:10:06.000000000 -0500
-+++ ../sys/Interpreter.h	2009-04-28 09:09:54.000000000 -0400
+diff -ur -x '*.[oa]' ../../sources_5104/sys/Interpreter.h ../sys/Interpreter.h
+--- ../../sources_5104/sys/Interpreter.h	2009-01-20 16:10:06.000000000 -0500
++++ ../sys/Interpreter.h	2009-04-28 09:44:25.000000000 -0400
 @@ -54,6 +54,7 @@
  	unsigned char types [1+Interpreter_MAXNUM_PARAMETERS]; \
  	wchar_t *arguments [1+Interpreter_MAXNUM_PARAMETERS]; \
@@ -76,49 +76,49 @@ diff -ur -x '*.[oa]' ../../sources_5102/sys/Interpreter.h ../sys/Interpreter.h
  
  InterpreterVariable Interpreter_hasVariable (Interpreter me, const wchar_t *key);
  InterpreterVariable Interpreter_lookUpVariable (Interpreter me, const wchar_t *key);
-diff -ur -x '*.[oa]' ../../sources_5102/sys/praat.c ../sys/praat.c
---- ../../sources_5102/sys/praat.c	2009-01-18 13:54:16.000000000 -0500
-+++ ../sys/praat.c	2009-04-28 09:04:00.000000000 -0400
-@@ -1106,13 +1106,16 @@
+diff -ur -x '*.[oa]' ../../sources_5104/sys/praat.c ../sys/praat.c
+--- ../../sources_5104/sys/praat.c	2009-03-21 23:41:42.000000000 -0400
++++ ../sys/praat.c	2009-04-28 09:51:39.000000000 -0400
+@@ -1109,13 +1109,16 @@
  	if (Melder_batch) {
  		#if defined (UNIX) || defined (macintosh) || defined (_WIN32) && defined (CONSOLE_APPLICATION)
- 			MelderString_empty (& theCurrentPraat -> batchName);
-+			theCurrentPraat -> argv = (wchar_t**)malloc (sizeof (wchar_t*) * argc);
+ 			MelderString_empty (& theCurrentPraatApplication -> batchName);
++			theCurrentPraatApplication -> argv = (wchar_t**)malloc (sizeof (wchar_t*) * argc);
  			for (unsigned int i = iarg_batchName; i < argc; i ++) {
  				int needsQuoting = strchr (argv [i], ' ') != NULL && (i == iarg_batchName || i < argc - 1);
- 				if (i > 1) MelderString_append1 (& theCurrentPraat -> batchName, L" ");
- 				if (needsQuoting) MelderString_append1 (& theCurrentPraat -> batchName, L"\"");
- 				MelderString_append1 (& theCurrentPraat -> batchName, Melder_peekUtf8ToWcs (argv [i]));
- 				if (needsQuoting) MelderString_append1 (& theCurrentPraat -> batchName, L"\"");
-+				theCurrentPraat -> argv[i-iarg_batchName] = Melder_peekUtf8ToWcs (argv [i]);
+ 				if (i > 1) MelderString_append1 (& theCurrentPraatApplication -> batchName, L" ");
+ 				if (needsQuoting) MelderString_append1 (& theCurrentPraatApplication -> batchName, L"\"");
+ 				MelderString_append1 (& theCurrentPraatApplication -> batchName, Melder_peekUtf8ToWcs (argv [i]));
+ 				if (needsQuoting) MelderString_append1 (& theCurrentPraatApplication -> batchName, L"\"");
++				theCurrentPraatApplication -> argv[i-iarg_batchName] = Melder_peekUtf8ToWcs (argv [i]);
  			}
-+			theCurrentPraat -> argv[argc-iarg_batchName] = NULL;
++			theCurrentPraatApplication -> argv[argc-iarg_batchName] = NULL;
  		#elif defined (_WIN32)
- 			MelderString_copy (& theCurrentPraat -> batchName, Melder_peekUtf8ToWcs (argv [3]));
+ 			MelderString_copy (& theCurrentPraatApplication -> batchName, Melder_peekUtf8ToWcs (argv [3]));
  		#endif
-@@ -1331,7 +1334,7 @@
+@@ -1334,7 +1337,7 @@
  				praat_exit (-1);
  			}
  		} else {
--			if (praat_executeScriptFromFileNameWithArguments (theCurrentPraat -> batchName.string)) {
-+			if (praat_executeScriptFromFileNameWithArguments2 (theCurrentPraat -> batchName.string, (const wchar_t**)theCurrentPraat -> argv)) {
+-			if (praat_executeScriptFromFileNameWithArguments (theCurrentPraatApplication -> batchName.string)) {
++		 	if (praat_executeScriptFromFileNameWithArguments2 (theCurrentPraatApplication -> batchName.string, (const wchar_t**)theCurrentPraatApplication -> argv)) {
  				praat_exit (0);
  			} else {
  				structMelderFile batchFile = { 0 };
-diff -ur -x '*.[oa]' ../../sources_5102/sys/praat.h ../sys/praat.h
---- ../../sources_5102/sys/praat.h	2009-03-09 14:01:35.000000000 -0400
-+++ ../sys/praat.h	2009-04-28 08:55:04.000000000 -0400
-@@ -145,6 +145,7 @@
- 	int n;	 /* The current number of objects in the list. */
- 	structPraat_Object list [1 + praat_MAXNUM_OBJECTS];   /* The list of objects: list [1..n]. */
+diff -ur -x '*.[oa]' ../../sources_5104/sys/praat.h ../sys/praat.h
+--- ../../sources_5104/sys/praat.h	2009-03-21 21:42:13.000000000 -0400
++++ ../sys/praat.h	2009-04-28 09:44:25.000000000 -0400
+@@ -143,6 +143,7 @@
+ #define praat_MAXNUM_OBJECTS 10000   /* Maximum number of objects in the list. */
+ typedef struct {   /* Readonly */
  	MelderString batchName;   /* The name of the command file when called from batch. */
 +	wchar_t **argv; /* NULL-terminated list of command-line arguments including the file name. */
  	int batch;   /* Was the program called from the command line? */
- 	int totalSelection;   /* The total number of selected objects, <= n. */
- 	int totalBeingCreated;
-diff -ur -x '*.[oa]' ../../sources_5102/sys/praat_script.c ../sys/praat_script.c
---- ../../sources_5102/sys/praat_script.c	2009-01-20 19:28:10.000000000 -0500
-+++ ../sys/praat_script.c	2009-04-28 09:09:29.000000000 -0400
+ 	#if gtk
+ 		GMainContext *context;
+diff -ur -x '*.[oa]' ../../sources_5104/sys/praat_script.c ../sys/praat_script.c
+--- ../../sources_5104/sys/praat_script.c	2009-03-21 23:44:01.000000000 -0400
++++ ../sys/praat_script.c	2009-04-28 09:44:25.000000000 -0400
 @@ -368,6 +368,10 @@
  }
  
@@ -160,9 +160,9 @@ diff -ur -x '*.[oa]' ../../sources_5102/sys/praat_script.c ../sys/praat_script.c
  }
  
  int praat_executeScriptFromText (wchar_t *text) {
-diff -ur -x '*.[oa]' ../../sources_5102/sys/praat_script.h ../sys/praat_script.h
---- ../../sources_5102/sys/praat_script.h	2009-01-18 11:50:50.000000000 -0500
-+++ ../sys/praat_script.h	2009-04-28 08:57:49.000000000 -0400
+diff -ur -x '*.[oa]' ../../sources_5104/sys/praat_script.h ../sys/praat_script.h
+--- ../../sources_5104/sys/praat_script.h	2009-01-18 11:50:50.000000000 -0500
++++ ../sys/praat_script.h	2009-04-28 09:44:25.000000000 -0400
 @@ -28,7 +28,9 @@
  int praat_executeCommand (Interpreter me, const wchar_t *command);
  int praat_executeCommandFromStandardInput (const char *programName);
@@ -173,9 +173,9 @@ diff -ur -x '*.[oa]' ../../sources_5102/sys/praat_script.h ../sys/praat_script.h
  int praat_executeScriptFromText (wchar_t *text);
  int praat_executeScriptFromDialog (Any dia);
  int DO_praat_runScript (UiForm sendingForm, const wchar_t *sendingString, Interpreter interpreter_dummy, void *dummy);
-diff -ur -x '*.[oa]' ../../sources_5102/sys/UiFile.c ../sys/UiFile.c
---- ../../sources_5102/sys/UiFile.c	2009-01-19 16:24:16.000000000 -0500
-+++ ../sys/UiFile.c	2009-03-18 10:04:47.000000000 -0400
+diff -ur -x '*.[oa]' ../../sources_5104/sys/UiFile.c ../sys/UiFile.c
+--- ../../sources_5104/sys/UiFile.c	2009-01-19 16:24:16.000000000 -0500
++++ ../sys/UiFile.c	2009-04-28 09:44:25.000000000 -0400
 @@ -83,10 +83,11 @@
  		#if motif
  			XtUnrealizeWidget (XtParent (my dialog));
