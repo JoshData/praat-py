@@ -1,3 +1,11 @@
+2009-05-05 Version 0.61
+
+	* Running scripts not from the command line was broken. Ooops.
+	* go() now returns the selected object (or None) after the call
+	  for convenience. Good for calls that create new objects.
+	* selected() no longer raises an error but instead returns None
+	  if nothing is selected.
+
 2009-04-28 Version 0.6
 
 	* Access command-line arguments from within the script with praat.argv or just argv.

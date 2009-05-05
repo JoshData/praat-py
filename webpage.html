@@ -127,7 +127,7 @@ endfor</pre></td>
 <div style="margin-left: 2em">
 	<div>Based on <b>Praat v5.1.04 (April 4, 2009)</b>
 	and
-	<b>Praat-Py v0.6 (April 28, 2009)</b></div>
+	<b>Praat-Py v0.61 (May 5, 2009)</b></div>
 
 	<p>Ubuntu Linux 9.04, i386/32bit (Python 2.6): <a href="dist/praat-py_ubuntu_jaunty">Download</a></p>
 	<p>Ubuntu Linux 8.10, i386/32bit (Python 2.4): <a href="dist/praat-py_ubuntu_gustyy">Download</a></p>
@@ -173,6 +173,10 @@ go("View")</pre>
 	You'll notice that as compared to Praat Script, they way you put the arguments
 	together is significantly more straight-forward.  To use variables, for instance,
 	you just use them (no strange quotes). In Praat Script, you never quote the final argument. Here, you quote all arguments uniformly: strings are quoted, and nothing else, as in Python normally.</p>
+	
+	<p><code>go(...)</code> returns the selected object after the command completes, or None if
+	nothing is selected. This is particularly useful for commands that create new objects in
+	the Praat list. See <code>selected()</code> below.</p>
 
 	<p>The third way is to have Praat do something but to capture the result of what it does.  You can capture numeric results with <code>getNum(<i>command</i>, <i>arguments...</i>)</code>:</p>
 
@@ -209,7 +213,7 @@ minus("Sound mysound", "TextGrid mysound") # deselects them
 minus( ("Sound", "mysound"), ("TextGrid", "mysound") ) # deselects them using the tuple form</pre>
 	
 	<p><code>selected()</code> is a function that returns the selected object. It returns a <i>tuple</i> containing the
-	type and name of the object separately.</p>
+	type and name of the object separately. If nothing is currently selected, None is returned.</p>
 	
 	<pre class="code">#lang=python
 select("Sound mysound")

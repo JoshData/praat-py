@@ -10,9 +10,12 @@
 #include "scripting.h"
 
 #include "../sys/melder.h"
+int praat_selection (void *klas);
 wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);
 
 static wchar_t **global_argv;
+
+static PyObject *extfunc_selected(PyObject *, PyObject *);
 
 /* Turn a Python tuple into a wchar_t list of the command and arguments. */
 
@@ -97,8 +100,13 @@ static PyObject* extfunc_go(PyObject *self, PyObject *args) {
 	if (PyErr_Occurred())
 		return NULL;
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	/* Originally we just returned None, but now we
+	 * return the currently selected object as a helper
+	 * for commands that create objects. Here's the old code:
+	 Py_INCREF(Py_None);
+	 return Py_None;
+	 */
+	return extfunc_selected(self, NULL);
 }
 
 static PyObject* extfunc_getString(PyObject *self, PyObject *args) {
@@ -209,9 +217,18 @@ static PyObject *extfunc_minus(PyObject *self, PyObject *args) {
 }
 
 static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
-	if (!PyArg_ParseTuple(args, ""))
+	// args is probably never NULL coming from Python, but
+	// we call this from extfunc_go and pass NULL for args
+	// as a convenience.
+	if (args && !PyArg_ParseTuple(args, ""))
 		return NULL;
-		
+	
+	// Prevents errors below if nothing is selected.
+	if (praat_selection(NULL) == 0) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	
 	wchar_t *name = praat_getNameOfSelected(NULL, 0);
 	if (name == NULL) {
 		Py_INCREF(Py_None);
@@ -237,6 +254,11 @@ static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 static PyObject *extfunc_argv(PyObject *self, PyObject *args) {
 	if (!PyArg_ParseTuple(args, ""))
 		return NULL;
+
+	if (global_argv == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 	
 	PyObject* ret = PyList_New(0);
 	for (int i = 0; global_argv[i]; i++)
