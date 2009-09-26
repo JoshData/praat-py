@@ -1,3 +1,5 @@
+UPVER=5117
+
 DISTFILES=README Makefile \
 		scripting.c scripting.h python.c util.c util.h \
 		sendpraat_main.c \
@@ -23,7 +25,7 @@ sendpraat: ../sys/sendpraat.c sendpraat_main.c
 	gcc $(CCOPTS) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
 
 praat-py.patch:
-	diff -ur -x "*.[oa]" ../../sources_5104/ ..|grep -v "Only in .." > praat-py.patch
+	diff -ur -x "*.[oa]" ../../sources_${UPVER}/ ..|grep -v "Only in .." > praat-py.patch
 
 patch-praat:
 	patch -p0 < praat-py.patch
