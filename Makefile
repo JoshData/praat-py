@@ -1,28 +1,31 @@
 UPVER=5117
 
+include ../makefile.defs
+
 DISTFILES=README Makefile \
 		scripting.c scripting.h python.c util.c util.h \
-		sendpraat_main.c \
 		praat-py.patch
 
-CCOPTS=-g -std=c99
+ifeq ($(EXE), praat.exe)
+	CC += -I winbuild/Python-2.6.2/Include -I winbuild/Python-2.6.2 -DMS_WIN32
+endif
 
-all: scripting.o python.o util.o sendpraat
+all: scripting.o python.o util.o
 
 clean:
 	rm *.o
 
 scripting.o: scripting.c scripting.h
-	gcc $(CCOPTS) -c scripting.c -o scripting.o
+	$(CC) -c scripting.c -o scripting.o
 	
 python.o: python.c
-	gcc $(CCOPTS) -c python.c -o python.o `python-config --cflags`
+	$(CC) -c python.c -o python.o `python-config --cflags`
 
 util.o: util.c util.h
-	gcc $(CCOPTS) -c util.c -o util.o
+	$(CC) -c util.c -o util.o
 
 sendpraat: ../sys/sendpraat.c sendpraat_main.c
-	gcc $(CCOPTS) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
+	$(CC) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
 
 praat-py.patch:
 	diff -ur -x "*.[oa]" ../../sources_${UPVER}/ ..|grep -v "Only in .." > praat-py.patch
