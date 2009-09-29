@@ -17,6 +17,11 @@ static wchar_t **global_argv;
 
 static PyObject *extfunc_selected(PyObject *, PyObject *);
 
+// We can't use the global symbols on Windows because
+// we need to get a reference to the object through
+// a function call.
+static PyObject *g_Py_False, *g_Py_True, *g_PrPyExc;
+
 /* Turn a Python tuple into a wchar_t list of the command and arguments. */
 
 static wchar_t ** make_command(PyObject *args) {
@@ -27,9 +32,9 @@ static wchar_t ** make_command(PyObject *args) {
 	for (i = 0; i < PyTuple_Size(args); i++) {
 		PyObject *elem = PyTuple_GetItem(args, i);
 
-		if (elem == Py_False) {
+		if (elem == g_Py_False) {
 			ret[i] = wcsdup(L"false");
-		} else if (elem == Py_True) {
+		} else if (elem == g_Py_True) {
 			ret[i] = wcsdup(L"true");
 		} else if (PyInt_Check(elem)) {
 			long x = PyInt_AsLong(elem);
@@ -43,13 +48,13 @@ static wchar_t ** make_command(PyObject *args) {
 			const char *src = PyString_AsString(elem);
 			ret[i] = (wchar_t*)calloc(strlen(src)+1, sizeof(wchar_t));
 			if (mbsrtowcs (ret[i], &src, strlen(src)+1, NULL) == -1)
-				PyErr_SetString(PyExc_ValueError, "Wide character conversion of string argument failed.");
+				PyErr_SetString(g_PrPyExc, "Wide character conversion of string argument failed.");
 		} else if (PyUnicode_Check(elem)) {
 			ret[i] = (wchar_t*)calloc(PyUnicode_GetSize(elem)+1, sizeof(wchar_t));
-			if (PyUnicode_AsWideChar(elem, ret[i], PyUnicode_GetSize(elem) + 1) == -1)
-				PyErr_SetString(PyExc_ValueError, "Wide character conversion of unicode argument failed.");
+			if (PyUnicode_AsWideChar((PyUnicodeObject*)elem, ret[i], PyUnicode_GetSize(elem) + 1) == -1)
+				PyErr_SetString(g_PrPyExc, "Wide character conversion of unicode argument failed.");
 		} else {
-			PyErr_SetString(PyExc_ValueError, "Only Python strings, integers, floats, True, False, and Unicode strings can be used as arguments to Praat commands.");
+			PyErr_SetString(g_PrPyExc, "Only Python strings, integers, floats, True, False, and Unicode strings can be used as arguments to Praat commands.");
 		}
 	}
 
@@ -87,7 +92,7 @@ static wchar_t* go_internal(PyObject *args, int captureOutput) {
 	
 	if (hadError) {
 		char *cret = wc2c(ret, 1);
-		PyErr_SetString(PyExc_Exception, cret);
+		PyErr_SetString(g_PrPyExc, cret);
 		free(cret);
 		return NULL;
 	}
@@ -132,7 +137,7 @@ static PyObject* extfunc_getNum(PyObject *self, PyObject *args) {
 		char *cret = wc2c(ret, 1);
 		sprintf(buf, "No numeric value found in Info window output: %s", cret);
 		free(cret);
-		PyErr_SetString(PyExc_Exception, buf);
+		PyErr_SetString(g_PrPyExc, buf);
 		return NULL;
 	}
 }
@@ -146,7 +151,7 @@ static PyObject *extfunc_do_select(PyObject *self, PyObject *args, int mode) {
 	// This accepts a variable number of arguments.
 	
 	if (PyTuple_Size(args) == 0) {
-		PyErr_SetString(PyExc_ValueError, "You must pass at least one Praat object name to the select method.");
+		PyErr_SetString(g_PrPyExc, "You must pass at least one Praat object name to the select method.");
 		return NULL;
 	}
 	
@@ -164,7 +169,7 @@ static PyObject *extfunc_do_select(PyObject *self, PyObject *args, int mode) {
 				return NULL;
 
 		} else {
-			PyErr_SetString(PyExc_ValueError, "Arguments to select must be strings like 'LongSound mysound' or tuples like ('LongSound', 'mysound').");
+			PyErr_SetString(g_PrPyExc, "Arguments to select must be strings like 'LongSound mysound' or tuples like ('LongSound', 'mysound').");
 			return NULL;
 		}
 		
@@ -193,7 +198,7 @@ static PyObject *extfunc_do_select(PyObject *self, PyObject *args, int mode) {
 		wchar_t *ret = scripting_executePraatCommand(command, 0, &haderror);
 		if (haderror) {
 			char *cret = wc2c(ret, 1);
-			PyErr_SetString(PyExc_Exception, cret);
+			PyErr_SetString(g_PrPyExc, cret);
 			free(cret);
 			return NULL;
 		}
@@ -376,6 +381,8 @@ static void initModule()  {
 
     Py_INCREF(&praatpy_InfoWindowStreamObj);
     PyModule_AddObject(m, "InfoWindow", (PyObject *)&praatpy_InfoWindowStreamObj);
+    
+    g_PrPyExc = PyErr_NewException("praat.PraatPyException", NULL, NULL);
 }
 
 void scripting_run_python(wchar_t *script, wchar_t **argv) {
@@ -383,6 +390,8 @@ void scripting_run_python(wchar_t *script, wchar_t **argv) {
 	global_argv = argv;
 	Py_Initialize();
 	initModule();
+	g_Py_False = PyBool_FromLong(0);
+	g_Py_True = PyBool_FromLong(1);
 	PyRun_SimpleString("import praat");
 	PyRun_SimpleString("praat.argv = praat.getargv()");
 	PyRun_SimpleString("from praat import *");
