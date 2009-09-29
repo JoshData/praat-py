@@ -103,8 +103,7 @@ static PyObject* extfunc_go(PyObject *self, PyObject *args) {
 	/* Originally we just returned None, but now we
 	 * return the currently selected object as a helper
 	 * for commands that create objects. Here's the old code:
-	 Py_INCREF(Py_None);
-	 return Py_None;
+	 return Py_BuildValue("");
 	 */
 	return extfunc_selected(self, NULL);
 }
@@ -200,8 +199,7 @@ static PyObject *extfunc_do_select(PyObject *self, PyObject *args, int mode) {
 		}
 	}
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	return Py_BuildValue("");
 }
 
 static PyObject *extfunc_select(PyObject *self, PyObject *args) {
@@ -224,24 +222,18 @@ static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 		return NULL;
 	
 	// Prevents errors below if nothing is selected.
-	if (praat_selection(NULL) == 0) {
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+	if (praat_selection(NULL) == 0)
+		return Py_BuildValue("");
 	
 	wchar_t *name = praat_getNameOfSelected(NULL, 0);
-	if (name == NULL) {
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+	if (name == NULL)
+		return Py_BuildValue("");
 
 	char *name2 = wc2c(name, 0);
 	
 	char *space = strstr(name2, " ");
-	if (space == NULL) {
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+	if (space == NULL)
+		return Py_BuildValue("");
 	
 	*space = 0; // split into two strings
 	
@@ -255,10 +247,8 @@ static PyObject *extfunc_argv(PyObject *self, PyObject *args) {
 	if (!PyArg_ParseTuple(args, ""))
 		return NULL;
 
-	if (global_argv == NULL) {
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+	if (global_argv == NULL)
+		return Py_BuildValue("");
 	
 	PyObject* ret = PyList_New(0);
 	for (int i = 0; global_argv[i]; i++)
@@ -311,8 +301,7 @@ static PyObject *extfunc_InfoWindowWrite(PyObject *self, PyObject *args) {
 
 	Melder_print (buffer);
 
-	Py_INCREF(Py_None);
-	return Py_None;
+	return Py_BuildValue("");
 }
 
 typedef struct {
