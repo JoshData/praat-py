@@ -15,6 +15,10 @@ wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);
 
 static void *current_interpreter = NULL; // global state; bad programming style, yes
 
+void scripting_executePraatCommand2(wchar_t *command) {
+	praat_executeCommand (current_interpreter, command);
+}
+
 wchar_t *scripting_executePraatCommand (wchar_t **commandargs, int divert, int *haderror) {
 	// This runs a Praat Script command whose command and arguments are stored
 	// in the NULL-terminated commandargs array, which *this function* frees
@@ -83,7 +87,7 @@ wchar_t *scripting_executePraatCommand (wchar_t **commandargs, int divert, int *
 	free(commandargs);
 	
 	if (divert) Melder_divertInfo (&value);
-	praat_executeCommand (current_interpreter, command);
+	scripting_executePraatCommand2 (command);
 	if (divert) Melder_divertInfo (NULL);
 	
 	free(command);

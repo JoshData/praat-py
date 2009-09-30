@@ -1,6 +1,164 @@
+diff -ur -x '*.[oa]' ../../sources_5117/audio/Makefile ../audio/Makefile
+--- ../../sources_5117/audio/Makefile	2008-06-01 15:45:50.000000000 -0400
++++ ../audio/Makefile	2009-09-27 18:39:02.000000000 -0400
+@@ -5,10 +5,13 @@
+ 
+ all: libaudio.a
+ 
+-OBJECTS = pa_unix_hostapis.o pa_linux_alsa.o \
+-	pa_front.o pa_unix_util.o pa_debugprint.o pa_cpuload.o \
++OBJECTS = \
++	pa_unix_util.o pa_unix_hostapis.o pa_linux_alsa.o \
++	pa_win_util.o pa_win_hostapis.o pa_win_wmme.o pa_win_waveformat.o pa_skeleton.o \
++	pa_front.o pa_debugprint.o pa_cpuload.o \
+ 	pa_allocation.o pa_process.o pa_converters.o pa_dither.o \
+ 	pa_stream.o
++#	pa_win_wmme.o pa_win_ds.o
+ 
+ all: libaudio.a
+ libaudio.a: $(OBJECTS)
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_linux_alsa.c ../audio/pa_linux_alsa.c
+--- ../../sources_5117/audio/pa_linux_alsa.c	2007-09-12 13:39:48.000000000 -0400
++++ ../audio/pa_linux_alsa.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifndef _WIN32
+ /*
+  * $Id: pa_linux_alsa.c 1278 2007-09-12 17:39:48Z aknudsen $
+  * PortAudio Portable Real-Time Audio Library
+@@ -3561,3 +3562,4 @@
+ error:
+     return result;
+ }
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_skeleton.c ../audio/pa_skeleton.c
+--- ../../sources_5117/audio/pa_skeleton.c	2006-08-26 04:27:53.000000000 -0400
++++ ../audio/pa_skeleton.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_skeleton.c 1097 2006-08-26 08:27:53Z rossb $
+  * Portable Audio I/O Library skeleton implementation
+@@ -810,7 +811,4 @@
+ 
+     return 0;
+ }
+-
+-
+-
+-
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_unix_hostapis.c ../audio/pa_unix_hostapis.c
+--- ../../sources_5117/audio/pa_unix_hostapis.c	2008-06-11 08:08:23.000000000 -0400
++++ ../audio/pa_unix_hostapis.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifndef _WIN32
+ /*
+  * $Id: pa_unix_hostapis.c 1097 2006-08-26 08:27:53Z rossb $
+  * Portable Audio I/O Library UNIX initialization table
+@@ -64,3 +65,4 @@
+     };
+ 
+ int paDefaultHostApiIndex = 0;
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_unix_util.c ../audio/pa_unix_util.c
+--- ../../sources_5117/audio/pa_unix_util.c	2007-06-16 10:49:43.000000000 -0400
++++ ../audio/pa_unix_util.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifndef _WIN32
+ /*
+  * $Id: pa_unix_util.c 1232 2007-06-16 14:49:43Z rossb $
+  * Portable Audio I/O Library
+@@ -664,3 +665,4 @@
+ }
+ */
+ #endif
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_win_ds.c ../audio/pa_win_ds.c
+--- ../../sources_5117/audio/pa_win_ds.c	2008-07-03 15:17:48.000000000 -0400
++++ ../audio/pa_win_ds.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_ds.c 1286 2007-09-26 21:34:23Z rossb $
+  * Portable Audio I/O Library DirectSound implementation
+@@ -2505,6 +2506,4 @@
+ 
+     return 0;
+ }
+-
+-
+-
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_win_hostapis.c ../audio/pa_win_hostapis.c
+--- ../../sources_5117/audio/pa_win_hostapis.c	2008-07-14 10:41:07.000000000 -0400
++++ ../audio/pa_win_hostapis.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_hostapis.c 1097 2006-08-26 08:27:53Z rossb $
+  * Portable Audio I/O Library Windows initialization table
+@@ -69,11 +70,12 @@
+     {
+         PaSkeleton_Initialize,   // 0; just for testing
+         PaWinMme_Initialize,   // 1
+-        PaWinDs_Initialize,   // 2
+-        PaWinWdm_Initialize,   // 3
++        //PaWinDs_Initialize,   // 2
++        //PaWinWdm_Initialize,   // 3
+         //PaAsio_Initialize,
+ 		//PaWinWasapi_Initialize,
+         0   /* NULL terminated array */
+     };
+ 
+ int paDefaultHostApiIndex = 1;
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_win_util.c ../audio/pa_win_util.c
+--- ../../sources_5117/audio/pa_win_util.c	2008-07-03 15:20:12.000000000 -0400
++++ ../audio/pa_win_util.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_util.c 1197 2007-05-04 13:07:10Z gordon_gidluck $
+  * Portable Audio I/O Library
+@@ -146,3 +147,4 @@
+ #endif                
+     }
+ }
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_win_waveformat.c ../audio/pa_win_waveformat.c
+--- ../../sources_5117/audio/pa_win_waveformat.c	2008-07-03 15:19:50.000000000 -0400
++++ ../audio/pa_win_waveformat.c	2009-09-29 10:15:34.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * PortAudio Portable Real-Time Audio Library
+  * Windows WAVEFORMAT* data structure utilities
+@@ -158,3 +159,4 @@
+         }
+     */
+ }
++#endif
+diff -ur -x '*.[oa]' ../../sources_5117/audio/pa_win_wmme.c ../audio/pa_win_wmme.c
+--- ../../sources_5117/audio/pa_win_wmme.c	2008-07-03 16:46:33.000000000 -0400
++++ ../audio/pa_win_wmme.c	2009-09-29 10:09:08.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_wmme.c 1286 2007-09-26 21:34:23Z rossb $
+  * pa_win_wmme.c
+@@ -3894,8 +3895,5 @@
+     else
+         return 0;
+ }
+-
+-
+-
+-
++#endif
+ 
 diff -ur -x '*.[oa]' ../../sources_5117/dwsys/NUMcblas.c ../dwsys/NUMcblas.c
 --- ../../sources_5117/dwsys/NUMcblas.c	2007-11-30 18:21:29.000000000 -0500
-+++ ../dwsys/NUMcblas.c	2009-09-25 21:02:31.000000000 -0400
++++ ../dwsys/NUMcblas.c	2009-09-29 10:09:08.000000000 -0400
 @@ -1443,6 +1443,7 @@
  	double ret_val;
  
@@ -9,26 +167,82 @@ diff -ur -x '*.[oa]' ../../sources_5117/dwsys/NUMcblas.c ../dwsys/NUMcblas.c
  	return ret_val;
  }								/* dlamc3_ */
  
+diff -ur -x '*.[oa]' ../../sources_5117/FLAC/flac_FLAC_format.h ../FLAC/flac_FLAC_format.h
+--- ../../sources_5117/FLAC/flac_FLAC_format.h	2008-05-02 09:49:12.000000000 -0400
++++ ../FLAC/flac_FLAC_format.h	2009-09-27 17:56:08.000000000 -0400
+@@ -1005,7 +1005,7 @@
+ 
+ // pb 20080502
+ #ifdef _WIN32
+-	#include "melder.h"
++	#include "../sys/melder.h"
+ 	#define fopen(filename,mode)  _wfopen (Melder_peekWcsToUtf16 (Melder_peekUtf8ToWcs (filename)), L"" mode)
+ #endif
+ 
+diff -ur -x '*.[oa]' ../../sources_5117/FLAC/Makefile ../FLAC/Makefile
+--- ../../sources_5117/FLAC/Makefile	2007-06-03 15:26:18.000000000 -0400
++++ ../FLAC/Makefile	2009-09-29 10:16:21.000000000 -0400
+@@ -4,6 +4,9 @@
+ include ../makefile.defs
+ 
+ CFLAGS = -DFLAC__NOASM -I .
++ifeq ($(EXE),praat.exe)
++	CFLAGS += -DSIZE_T_MAX=UINT_MAX
++endif
+ 
+ # EREZ ?
+ # On non-Intel, also define -DFLAC__CPU_UNKNOWN
 diff -ur -x '*.[oa]' ../../sources_5117/makefile ../makefile
 --- ../../sources_5117/makefile	2009-07-08 12:17:16.000000000 -0400
-+++ ../makefile	2009-09-25 21:03:29.000000000 -0400
-@@ -27,6 +27,7 @@
++++ ../makefile	2009-09-27 21:06:26.000000000 -0400
+@@ -3,6 +3,9 @@
+ # Makefile for Praat.
+ # Paul Boersma, 8 July 2009
+ 
++EXE=praat
++LD_PYTHON=`python-config --ldflags`
++
+ # System-dependent definitions of CC, LIBS, ICON and MAIN_ICON should be in
+ # makefile.defs, which has to be copied and renamed
+ # from a suitable makefile.defs.XXX file in the makefiles directory,
+@@ -27,11 +30,13 @@
  	cd gram; make
  	cd FFNet; make
  	cd artsynth; make
 +	cd scripting; make
  	cd contrib/ola; make
  	cd main; make main_Praat.o $(ICON)
- 	$(CC) -o praat main/main_Praat.o $(MAIN_ICON) fon/libfon.a contrib/ola/libOla.a \
-@@ -34,4 +35,5 @@
+-	$(CC) -o praat main/main_Praat.o $(MAIN_ICON) fon/libfon.a contrib/ola/libOla.a \
++	$(CC) -g -o $(EXE) main/main_Praat.o $(MAIN_ICON) fon/libfon.a contrib/ola/libOla.a \
+ 		LPC/libLPC.a FFNet/libFFNet.a gram/libgram.a dwtools/libdwtools.a \
  		artsynth/libartsynth.a fon/libfon.a stat/libstat.a dwsys/libdwsys.a \
  		sys/libsys.a num/libnum.a GSL/libgsl.a num/glpk/libglpk.a kar/libkar.a \
  		audio/libaudio.a FLAC/libFLAC.a mp3/libmp3.a \
-+		scripting/scripting.o scripting/python.o scripting/util.o `python-config --ldflags` \
- 		$(LIBS)
+-		$(LIBS)
++		$(LIBS) \
++		scripting/scripting.o scripting/python.o scripting/util.o $(LD_PYTHON)
+diff -ur -x '*.[oa]' ../../sources_5117/makefiles/makefile.defs.mingw ../makefiles/makefile.defs.mingw
+--- ../../sources_5117/makefiles/makefile.defs.mingw	2007-03-20 17:46:59.000000000 -0400
++++ ../makefiles/makefile.defs.mingw	2009-09-29 09:16:22.000000000 -0400
+@@ -3,10 +3,13 @@
+ # System: MinGW
+ # Eric Carlson & Paul Boersma, March 20, 2007
+ 
+-CC = mingw32-gcc -D_WIN32 -DMINGW -std=gnu99 -DDONT_INCLUDE_QUICKTIME -Dmain=wingwmain -mwindows -O2
++CC = mingw32-gcc -D_WIN32 -DMINGW -DUNICODE -std=gnu99 -DDONT_INCLUDE_QUICKTIME -Dmain=wingwmain -mwindows -O2
+ 
+ LIBS = -lwinmm -lwsock32 -lcomctl32
+ 
+-RANLIB = ls
++RANLIB = i586-mingw32msvc-ranlib
+ ICON = praat_win.o
+ MAIN_ICON = main/praat_win.o
++
++EXE=praat.exe
++LD_PYTHON=-Lscripting -lpython26
 diff -ur -x '*.[oa]' ../../sources_5117/sys/Interpreter.c ../sys/Interpreter.c
 --- ../../sources_5117/sys/Interpreter.c	2009-08-04 13:55:29.000000000 -0400
-+++ ../sys/Interpreter.c	2009-09-25 21:02:31.000000000 -0400
++++ ../sys/Interpreter.c	2009-09-29 10:09:09.000000000 -0400
 @@ -56,6 +56,7 @@
  extern structMelderDir praatDir;
  #include "praat_script.h"
@@ -78,7 +292,7 @@ diff -ur -x '*.[oa]' ../../sources_5117/sys/Interpreter.h ../sys/Interpreter.h
  InterpreterVariable Interpreter_lookUpVariable (Interpreter me, const wchar_t *key);
 diff -ur -x '*.[oa]' ../../sources_5117/sys/praat.c ../sys/praat.c
 --- ../../sources_5117/sys/praat.c	2009-08-17 15:39:16.000000000 -0400
-+++ ../sys/praat.c	2009-09-25 21:02:31.000000000 -0400
++++ ../sys/praat.c	2009-09-29 10:09:10.000000000 -0400
 @@ -1129,13 +1129,16 @@
  	if (Melder_batch) {
  		#if defined (UNIX) || defined (macintosh) || defined (_WIN32) && defined (CONSOLE_APPLICATION)
@@ -118,7 +332,7 @@ diff -ur -x '*.[oa]' ../../sources_5117/sys/praat.h ../sys/praat.h
  		GMainContext *context;
 diff -ur -x '*.[oa]' ../../sources_5117/sys/praat_script.c ../sys/praat_script.c
 --- ../../sources_5117/sys/praat_script.c	2009-05-07 05:50:37.000000000 -0400
-+++ ../sys/praat_script.c	2009-09-25 21:02:31.000000000 -0400
++++ ../sys/praat_script.c	2009-09-29 10:09:10.000000000 -0400
 @@ -373,6 +373,10 @@
  }
  
@@ -175,7 +389,7 @@ diff -ur -x '*.[oa]' ../../sources_5117/sys/praat_script.h ../sys/praat_script.h
  int DO_praat_runScript (UiForm sendingForm, const wchar_t *sendingString, Interpreter interpreter_dummy, void *dummy);
 diff -ur -x '*.[oa]' ../../sources_5117/sys/UiFile.c ../sys/UiFile.c
 --- ../../sources_5117/sys/UiFile.c	2009-06-30 06:03:02.000000000 -0400
-+++ ../sys/UiFile.c	2009-09-25 21:02:31.000000000 -0400
++++ ../sys/UiFile.c	2009-09-29 10:09:09.000000000 -0400
 @@ -83,10 +83,11 @@
  		#if motif
  			XtUnrealizeWidget (XtParent (my dialog));
@@ -189,3 +403,55 @@ diff -ur -x '*.[oa]' ../../sources_5117/sys/UiFile.c ../sys/UiFile.c
  }
  
  #ifndef macintosh
+@@ -320,10 +321,12 @@
+ 			infoTipsWereVisible = settings. fShowInfoTip != 0;
+ 			extensionsWereVisible = settings. fShowExtensions != 0;
+ 			if (infoTipsWereVisible | ! extensionsWereVisible) {
++				#if (_WIN32_WINNT >= 0x0500)
+ 				SHELLSTATE state = { 0 };
+ 				state. fShowInfoTip = 0;
+ 				state. fShowExtensions = /*1*/ extensionsWereVisible;
+ 				SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++				#endif
+ 			}
+ 		}
+ 		if (GetOpenFileNameW (& openFileName)) {
+@@ -349,10 +352,12 @@
+ 		}
+ 		if (hasFileInfoTipsBug) {
+ 			if (infoTipsWereVisible | ! extensionsWereVisible) {
++				#if (_WIN32_WINNT >= 0x0500)
+ 				SHELLSTATE state = { 0 };
+ 				state. fShowInfoTip = infoTipsWereVisible;
+ 				state. fShowExtensions = extensionsWereVisible;
+ 				SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++				#endif
+ 			}
+ 		}
+ 	#else
+@@ -584,10 +589,12 @@
+ 		bool infoTipsWereVisible = settings. fShowInfoTip != 0;
+ 		bool extensionsWereVisible = settings. fShowExtensions != 0;
+ 		if (infoTipsWereVisible || ! extensionsWereVisible) {
++			#if (_WIN32_WINNT >= 0x0500)
+ 			SHELLSTATE state = { 0 };
+ 			state. fShowInfoTip = 0;
+ 			state. fShowExtensions = /*1*/ extensionsWereVisible;
+ 			SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++			#endif
+ 		}
+ 		if (GetSaveFileNameW (& openFileName)) {
+ 			if (my allowExecutionHook && ! my allowExecutionHook (my allowExecutionClosure)) {
+@@ -603,10 +610,12 @@
+ 			UiHistory_write (Melder_fileToPath (& my file));
+ 		}
+ 		if (infoTipsWereVisible || ! extensionsWereVisible) {
++			#if (_WIN32_WINNT >= 0x0500)
+ 			SHELLSTATE state = { 0 };
+ 			state. fShowInfoTip = infoTipsWereVisible;
+ 			state. fShowExtensions = extensionsWereVisible;
+ 			SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++			#endif
+ 		}
+ 	#else
+ 		#if motif

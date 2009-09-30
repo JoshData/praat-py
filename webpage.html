@@ -1,7 +1,8 @@
 <html>
 	<head>
-		<title>Praat-Py: Extended Praat for Python Scripting</title>
+		<title>Praat-Py: Praat with Python Scripting</title>
 		<style>
+			h2 { margin-top: 2em }
 			.sec { margin-left: 2em }
 			.code { background-color: #EFEFEF; padding: .5em; border: 1px solid #DDDDDD; }
 			code { font-weight: bold; font-size: 110%; letter-spacing: .33px; }
@@ -10,49 +11,34 @@
 	
 	<body>
 
-<h1>Praat-Py: Extended Praat for Python Scripting</h1>
+<h1>Praat-Py: Praat with Python Scripting</h1>
 
 <p>By Joshua Tauberer &lt;<a href="http://razor.occams.info">http://razor.occams.info</a>&gt;</p>
 
 <h2>Introduction</h2>
 <div class="sec">
-<p>Praat-Py (or lovingly also called PyPraat, but not PraatPy without the dash) is an extension to <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
+<p>Praat-Py is a custom build of <a href="http://www.fon.hum.uva.nl/praat/">Praat</a>,
 the computer program used by linguists for doing phonetic analysis on sound files,
-to allow for scripts to be written in the Python programming
+to allow for scripts to be written in the <a href="http://www.python.org">Python</a> programming
 language, rather than in Praat's built-in language.</p>
 
-<p>The motivation for this extension is to remove the need for Praat Script writers to
+<p>The motivation for this is to remove the need for Praat script writers to
 learn an entirely new programming language if they already know Python.
 Additionally, Python is a more complete programming language and so scripts of any complexity should be
 more easily written in Python. The goal isn't to make all scripts easier or shorter to write, but
 to make it possible to do some complex tasks more easily.</p>
 
-<p>All of the functionality of Praat's scripting language is (meant to) be retained
-when using Python.  However, forms are not implemented yet. Likewise, because
+<p>All of the functionality of Praat's scripting language is retained
+when using Python, except forms.  Likewise, because
 the Python interpreter is used, all Python functionality is possible, such as using
 all Python modules that you happen to have installed.</p>
 
 <p>This project is released under the same terms as Praat itself,
 the GPL v2 or later.</p>
-
-<p>Praat-Py works by linking to the Python interpreter. By and large, you will need to
-compile Praat-Py from sources yourself, which means you are probably on a Linux or Mac OSX
-computer. In that case, you must have Python installed (and possibly development files
-as well, i.e. the python-devel package or the like).</p>
-
-<table>
-<tr>
-<td style="padding: 2em; font-size: 120%"><i>
-Praat Scripting: Do you want to script better than this?
-</i></td>
-<td><img src="photo.jpg"/></td>
-</tr>
-</table>
-
 </div>
 
-<h2>Examples</h2>
 
+<h2>Example</h2>
 
 <div class="sec">
 <p>The following is an example script for Praat written in Python,
@@ -70,23 +56,22 @@ by Mietta Lennes.</p>
 <pre>#lang=python
 from glob import glob
 
-aiffdir = "/path/to/my-aif-files/"
+aiffdir = "/home/tauberer/"
 delete_AIFF_files_after_conversion = False
 
-for file in glob(aiffdir + "*.aif") :
-   go("Read from file...", file)
-   soundtype, soundname = selected()
-   go("Rename...", "temp")
+for file in glob(aiffdir + "*.aiff") :
    print "Converting file", file, "..."
-   go("Resample...", 16000, 50)
-   go("Rename...", soundname)
-   select("Sound temp")
-   go("Remove")
-   select(("Sound", soundname))
+	
+   aiff = go("Read from file...", file)
+   resampled = go("Resample...", 16000, 50)
+   soundtype, soundname = aiff
+	
    go("Write to WAV file...", aiffdir + soundname + ".wav")
    if delete_AIFF_files_after_conversion :
       go("filedelete", file)
-   go("Remove")</pre>
+		
+   remove(aiff)
+   remove(resampled)</pre>
 </td>
 <td>
 <pre>Create Strings as file list... aifffiles 'aiffdir$'*.aif
@@ -121,25 +106,26 @@ endfor</pre></td>
 
 <h3>Downloading Praat-Py</h3>
 <div class="sec">
-<p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain operating systems (i.e. Linux) because that is what I have available to create it for.</p>
+<p>Praat-Py is a replacement for the Praat executable file you downloaded from the Praat website.  I provide a ready-to-go version of Praat-Py only for certain platforms because that is what I have available to create it for.</p>
 
-<p>Here are some ready-to-go Praat-Py downloads:</p>
-<div style="margin-left: 2em">
-	<div>Based on <b>Praat v5.1.04 (April 4, 2009)</b>
-	and
-	<b>Praat-Py v0.61 (May 5, 2009)</b></div>
+<p>You will need to have the indicated version of Python already installed from <a href="http://www.python.org">www.Python.org</a>.</p>
 
-	<p>Ubuntu Linux 9.04, i386/32bit (Python 2.6): <a href="dist/praat-py_ubuntu_jaunty">Download</a></p>
-	<p>Ubuntu Linux 8.10, i386/32bit (Python 2.4): <a href="dist/praat-py_ubuntu_gustyy">Download</a></p>
-</div>
+<p>The current version is based on
+<b>Praat v5.1.17 (September 22, 2009)</b>
+and
+<b>Praat-Py v0.7 (September 30, 2009)</b> (<a href="dist/ChangeLog">change history</a>).
+</p>
 
-<p>If these downloads are not useful to you, you will need to build Praat-Py from its source files.  (Experienced users only!)  Instructions are below.</p>
+<table style="margin-left: 1em" cellspacing="10">
+	<tr><th>Platform</th> <th>Install Python</th> <th>Download Praat-Py</th></tr>
+	<tr><td>Ubuntu 9.04, i386/32bit</td> <td>Python 2.6</td> <td><a href="dist/ubuntu_jaunty/praat-py">Download</a></td></tr>
+	<tr><td>Microsoft Windows</td> <td><a href="http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi">Python 2.6</a></td> <td><a href="dist/win32/praat-py.exe">Download</a></td></tr>
+</table>
 
-<p>You can also...</p>
-<ul>
-<li><a href="http://razor.occams.info/code/repo/?/praat-py/ChangeLog">View the ChangeLog</a> (i.e. version history)</li>
-<li><a href="http://razor.occams.info/code/repo/?/praat-py">Browse Source Code Repository</a></li>
-</ul>
+<p>On Linux, after downloading the Praat-Py file, you have to make it executable (e.g. <code>chmod +x praat-py</code> on the command line). Then you just run it (e.g. <code>./praat-py</code> on the command line).</p>
+
+<p>If it doesn't work at all, you should install regular Praat from the <a href="http://www.praat.org">Praat website</a> to make sure you have everything required to run regular Praat. (On Linux, you'll want to choose the
+dynamically linked version.) If you use a different platform, you will need to compile Praat-Py from its sources (experienced hackers only): instructions are below.</p>
 
 </div>
 
@@ -176,7 +162,16 @@ go("View")</pre>
 	
 	<p><code>go(...)</code> returns the selected object after the command completes, or None if
 	nothing is selected. This is particularly useful for commands that create new objects in
-	the Praat list. See <code>selected()</code> below.</p>
+	the Praat list. See <code>selected()</code> below. Here's an example:</p>
+
+	<pre class="code">#lang=python
+wav = go("Read from file...", "myfile.wav")
+spec = go("To Spectrogram...", .005, maxfreq, .002, 20, "Gaussian")
+select(wav)
+part = go("Extract part...", 0.0, 1.0, True)
+remove(wav)
+remove(spec)
+remove(part)</pre>
 
 	<p>The third way is to have Praat do something but to capture the result of what it does.  You can capture numeric results with <code>getNum(<i>command</i>, <i>arguments...</i>)</code>:</p>
 
@@ -227,6 +222,17 @@ minus(s) # deselects the currently selected object</pre>
 
 	<p>(These new commands are defined in the <code>praat</code> module and are automatically imported.)</p>
 	
+	<h4>Other Shortcuts</h4>
+	
+	<p>Because removing objects from the Praat objects list is such a common task in scripts that batch-process files, there is a shortcut for selecting and then removing objects using <code>remove(object)</code>:</p>
+	
+	<pre class="code">#lang=python
+wav = go("Read from file...", "myfile.wav")
+...
+remove(wav)
+   or
+remove('Sound myfile')</pre>
+
 	<h4>Running the Script from the Command Line</h4>
 	
 	<p>As with Praat Scripts normally, you can run a script from the command-line directly (and never see Praat itself),
@@ -247,20 +253,12 @@ print argv     # this prints [u'myscript.praatpy', u'arg1', u'arg2']  (they're U
 </div>
 
 
-<h2>Limitations</h2>
-<div class="sec	">
-<p>Praat forms are not implemented</p>
-<p>I don't know how to build Praat on Windows, so there's no Windows version</p>
-<p>It would be nice to be able to manipulate Praat from an externally running script, too</p>
-<p>Can we get some or all of this integrated into the main Praat distribution?</p>
-</div>
-
-<h2>Building Praat with Praat-Py from Sources</h2>
+<h2>Building Praat-Py from Sources</h2>
 <div class="sec">
 
-<p>Building Praat-Py only works on Linux at the moment.</p>
+<p>You can build Praat-Py on any Unix platform... at least in principle. I build it on Ubuntu. YMMV elsewhere.</p>
 
-<p>1) You will need to have Python installed, and perhaps the "python-devel" package (or equivalent) for your distribution.</p>
+<p>1) You will need to have Python 2.6 installed and the "python-dev" package (or equivalent) for your distribution, or an install from sources.</p>
 
 <p>2)  Get the <a href="http://www.fon.hum.uva.nl/praat/download_sources.html">Praat sources</a> and follow the instructions to build Praat on
 your platform.  (You don't really need to build Praat
@@ -269,26 +267,25 @@ going forward.)</p>
 
 <p>For instance, on Linux, with the latest version of Praat at the time of writing:</p>
 
-<pre class="code">
-wget http://www.fon.hum.uva.nl/praat/praat5104_sources.tar.gz
-tar -zxf praat5104_sources.tar.gz
-cd sources_5104
+<pre class="code">wget http://www.fon.hum.uva.nl/praat/praat5117_sources.tar.gz
+tar -zxf praat5117_sources.tar.gz
+cd sources_5117
 cp makefiles/makefile.defs.linux.dynamic ./makefile.defs
-make
-</pre>
+make</pre>
 
-<p>3) Inside the Praat sources directory (i.e. <tt>sources_4430</tt> or
+<p>3) Inside the Praat sources directory (i.e. <tt>sources_5117</tt> or
 something similar), make a new directory called <tt>scripting</tt>
 and unzip the <a href="dist/praat-py.zip">Praat-Py ZIP package</a> into that directory.</p>
 
-<pre class="code">
-mkdir scripting
+<pre class="code">mkdir scripting
 cd scripting
 wget http://razor.occams.info/code/praat-py/dist/praat-py.zip
-unzip praat-py.zip
-</pre>
+unzip praat-py.zip</pre>
 
-<p>Alternatively, you can check out the SVN module <tt>svn://razor.occams.info/praat-py</tt> <i> as</i> the scripting directory.</p>
+<p>Alternatively, you can check out the SVN module <tt>svn://razor.occams.info/praat-py</tt> <i> as</i> the scripting directory:</p>
+
+<pre class="code">
+svn co svn://razor.occams.info/praat-py scripting</pre>
 
 <p>4) The Praat sources must be patched to build Praat-Py and to invoke the
 Python interpreter instead of the Praat script interpreter
@@ -297,6 +294,8 @@ when the script begins with the magic string "#lang=python".  Do this to patch y
 <pre class="code">
 make patch-praat
 </pre>
+
+<p>The patch also contains a number of fixes to make it compile and run properly on Ubuntu, and to cross-compile with mingw32 for Windows.</p>
 
 <p>5) Then exit out of the <tt>scripting</tt> directory and build Praat.</p>
 

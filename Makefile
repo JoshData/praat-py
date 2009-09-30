@@ -37,14 +37,23 @@ dist/praat-py.zip: $(DISTFILES)
 	rm -f dist/praat-py.zip
 	zip dist/praat-py.zip $(DISTFILES)
 
-dist/praat-py_linux_i386: dist/praat-py.zip
-	cd ..; make
-	cp ../praat dist/praat-py_linux_i386
+dist/ChangeLog: ChangeLog
+	cp ChangeLog dist/ChangeLog
+
+dist/ubuntu_jaunty/praat-py: dist/praat-py.zip
+	mkdir -p dist/ubuntu_jaunty
+	cd ..; bash build_linux.sh
+	cp ../praat dist/ubuntu_jaunty/praat-py
+
+dist/win32/praat-py.exe: dist/praat-py.zip
+	mkdir -p dist/win32
+	cd ..; bash build_win32.sh
+	cp ../praat.exe dist/win32/praat-py.exe
 
 praat: all
 	cd ..; make
 run-praat: all
 	cd ..; make; ./praat
 
-deploy: dist/praat-py.zip dist/praat-py_linux_i386
+deploy: dist/ChangeLog dist/praat-py.zip dist/ubuntu_jaunty/praat-py dist/win32/praat-py.exe
 	scp -r dist occams.info:www/code/praat-py

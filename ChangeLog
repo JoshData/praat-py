@@ -1,3 +1,8 @@
+2009-09-30 Version 0.7
+
+	* Added a remove() command.
+	* Now it cross-compiles for Windows using mingw32.
+
 2009-05-05 Version 0.61
 
 	* Running scripts not from the command line was broken. Ooops.

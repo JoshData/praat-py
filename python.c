@@ -219,6 +219,18 @@ static PyObject *extfunc_minus(PyObject *self, PyObject *args) {
 	return extfunc_do_select(self, args, 2);
 }
 
+static PyObject *extfunc_remove(PyObject *self, PyObject *args) {
+	// Select...
+	PyObject *none = extfunc_select(self, args);
+	if (none == NULL) return NULL; // error condition
+	
+	// Then remove...
+	scripting_executePraatCommand2(L"Remove");
+	
+	// And return the None value constructed for us already.
+	return none;
+}
+
 static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 	// args is probably never NULL coming from Python, but
 	// we call this from extfunc_go and pass NULL for args
@@ -276,10 +288,13 @@ static PyMethodDef EmbMethods[] = {
      "Selects the Praat object (or multiple objects). Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
 
     {"plus", extfunc_plus, METH_VARARGS,
-     "Adds the Praat object (or multiple objects) to the current selection. Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
+     "Adds the Praat object (or multiple objects) to the current selection. Pass either a name like 'LongSound mysound' or the type and name as a tuple like plus(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
 
     {"minus", extfunc_minus, METH_VARARGS,
-     "Deselects the Praat object (or multiple objects). Pass either a name like 'LongSound mysound' or the type and name as a tuple like select(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
+     "Deselects the Praat object (or multiple objects). Pass either a name like 'LongSound mysound' or the type and name as a tuple like minus(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
+
+    {"remove", extfunc_remove, METH_VARARGS,
+     "Removes the Praat object (or multiple objects) from the Praat objects list. Pass either a name like 'LongSound mysound' or the type and name as a tuple like remove(('Sound', 'mysound1'), ('Sound', 'mysound2'))."},
 
     {"selected", extfunc_selected, METH_VARARGS,
      "Returns the type and name of the selected Praat object, e.g. (type, name) = selected()."},
