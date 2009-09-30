@@ -37,8 +37,8 @@ dist/praat-py.zip: $(DISTFILES)
 	rm -f dist/praat-py.zip
 	zip dist/praat-py.zip $(DISTFILES)
 
-dist/ChangeLog: ChangeLog
-	cp ChangeLog dist/ChangeLog
+dist/ChangeLog.txt: ChangeLog
+	cp ChangeLog dist/ChangeLog.txt
 
 dist/ubuntu_jaunty/praat-py: dist/praat-py.zip
 	mkdir -p dist/ubuntu_jaunty
@@ -55,5 +55,5 @@ praat: all
 run-praat: all
 	cd ..; make; ./praat
 
-deploy: dist/ChangeLog dist/praat-py.zip dist/ubuntu_jaunty/praat-py dist/win32/praat-py.exe
+deploy: dist/ChangeLog.txt dist/praat-py.zip dist/ubuntu_jaunty/praat-py dist/win32/praat-py.exe
 	scp -r dist occams.info:www/code/praat-py
