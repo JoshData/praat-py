@@ -34,6 +34,7 @@ patch-praat:
 	patch -p0 < praat-py.patch
 
 dist/praat-py.zip: $(DISTFILES)
+	sed -i s/_snwprintf/swprintf/g *.c
 	rm -f dist/praat-py.zip
 	zip dist/praat-py.zip $(DISTFILES)
 
