@@ -1,0 +1,27 @@
+diff -ur -x '*.[oa]' ../dwsys/NUMcblas.c ../dwsys/NUMcblas.c
+--- ../dwsys/NUMcblas.c	2010-01-20 10:11:16.000000000 -0500
++++ ../dwsys/NUMcblas.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1444,5 +1444,6 @@
+ 	volatile double ret_val;
+ 
+ 	ret_val = *a + *b;
++	close (open ("/dev/null", 0));
+ 	return ret_val;
+ }								/* dlamc3_ */
+diff -ur -x '*.[oa]' ../sys/UiFile.c ../sys/UiFile.c
+--- ../sys/UiFile.c	2010-02-20 16:50:39.000000000 -0500
++++ ../sys/UiFile.c	2010-04-09 08:48:44.000000000 -0400
+@@ -84,10 +84,11 @@
+ 		#if motif
+ 			XtUnrealizeWidget (XtParent (my dialog));
+ 		#endif
+-		GuiObject_destroy (my dialog);
++/*		GuiObject_destroy (my dialog); */
+ 	#endif
+ 	if (me == currentUiFile) currentUiFile = NULL;   /* Undangle. */
+ 	inherited (UiFile) destroy (me);
++        me = NULL;
+ }
+ 
+ #ifndef macintosh
+

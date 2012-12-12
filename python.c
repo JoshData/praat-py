@@ -266,7 +266,7 @@ static PyObject *extfunc_argv(PyObject *self, PyObject *args) {
 
 	if (global_argv == NULL)
 		return Py_BuildValue("");
-	
+
 	PyObject* ret = PyList_New(0);
 	for (int i = 0; global_argv[i]; i++)
 		PyList_Append(ret, PyWString(global_argv[i]));

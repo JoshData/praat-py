@@ -1,0 +1,245 @@
+diff -ur -x '*.[oa]' ../audio/Makefile ../audio/Makefile
+--- ../audio/Makefile	2010-02-22 16:21:11.000000000 -0500
++++ ../audio/Makefile	2010-04-09 08:48:44.000000000 -0400
+@@ -6,6 +6,7 @@
+ OBJECTS = pa_unix_hostapis.o pa_linux_alsa.o \
+ 	pa_front.o pa_unix_util.o pa_debugprint.o pa_cpuload.o \
+ 	pa_allocation.o pa_process.o pa_converters.o pa_dither.o \
++	pa_win_util.o pa_win_hostapis.o pa_win_wmme.o pa_win_waveformat.o pa_skeleton.o \
+ 	pa_stream.o
+ 
+ .PHONY: all clean
+diff -ur -x '*.[oa]' ../audio/pa_linux_alsa.c ../audio/pa_linux_alsa.c
+--- ../audio/pa_linux_alsa.c	2007-09-12 13:39:48.000000000 -0400
++++ ../audio/pa_linux_alsa.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifndef _WIN32
+ /*
+  * $Id: pa_linux_alsa.c 1278 2007-09-12 17:39:48Z aknudsen $
+  * PortAudio Portable Real-Time Audio Library
+@@ -3561,3 +3562,4 @@
+ error:
+     return result;
+ }
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_skeleton.c ../audio/pa_skeleton.c
+--- ../audio/pa_skeleton.c	2006-08-26 04:27:53.000000000 -0400
++++ ../audio/pa_skeleton.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_skeleton.c 1097 2006-08-26 08:27:53Z rossb $
+  * Portable Audio I/O Library skeleton implementation
+@@ -810,7 +811,4 @@
+ 
+     return 0;
+ }
+-
+-
+-
+-
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_unix_hostapis.c ../audio/pa_unix_hostapis.c
+--- ../audio/pa_unix_hostapis.c	2008-06-11 08:08:23.000000000 -0400
++++ ../audio/pa_unix_hostapis.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifndef _WIN32
+ /*
+  * $Id: pa_unix_hostapis.c 1097 2006-08-26 08:27:53Z rossb $
+  * Portable Audio I/O Library UNIX initialization table
+@@ -64,3 +65,4 @@
+     };
+ 
+ int paDefaultHostApiIndex = 0;
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_unix_util.c ../audio/pa_unix_util.c
+--- ../audio/pa_unix_util.c	2007-06-16 10:49:43.000000000 -0400
++++ ../audio/pa_unix_util.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifndef _WIN32
+ /*
+  * $Id: pa_unix_util.c 1232 2007-06-16 14:49:43Z rossb $
+  * Portable Audio I/O Library
+@@ -664,3 +665,4 @@
+ }
+ */
+ #endif
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_win_ds.c ../audio/pa_win_ds.c
+--- ../audio/pa_win_ds.c	2008-07-03 15:17:48.000000000 -0400
++++ ../audio/pa_win_ds.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_ds.c 1286 2007-09-26 21:34:23Z rossb $
+  * Portable Audio I/O Library DirectSound implementation
+@@ -2505,6 +2506,4 @@
+ 
+     return 0;
+ }
+-
+-
+-
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_win_hostapis.c ../audio/pa_win_hostapis.c
+--- ../audio/pa_win_hostapis.c	2008-07-14 10:41:07.000000000 -0400
++++ ../audio/pa_win_hostapis.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_hostapis.c 1097 2006-08-26 08:27:53Z rossb $
+  * Portable Audio I/O Library Windows initialization table
+@@ -69,11 +70,12 @@
+     {
+         PaSkeleton_Initialize,   // 0; just for testing
+         PaWinMme_Initialize,   // 1
+-        PaWinDs_Initialize,   // 2
+-        PaWinWdm_Initialize,   // 3
++        //PaWinDs_Initialize,   // 2
++        //PaWinWdm_Initialize,   // 3
+         //PaAsio_Initialize,
+ 		//PaWinWasapi_Initialize,
+         0   /* NULL terminated array */
+     };
+ 
+ int paDefaultHostApiIndex = 1;
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_win_util.c ../audio/pa_win_util.c
+--- ../audio/pa_win_util.c	2008-07-03 15:20:12.000000000 -0400
++++ ../audio/pa_win_util.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_util.c 1197 2007-05-04 13:07:10Z gordon_gidluck $
+  * Portable Audio I/O Library
+@@ -146,3 +147,4 @@
+ #endif                
+     }
+ }
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_win_waveformat.c ../audio/pa_win_waveformat.c
+--- ../audio/pa_win_waveformat.c	2008-07-03 15:19:50.000000000 -0400
++++ ../audio/pa_win_waveformat.c	2010-04-09 09:30:46.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * PortAudio Portable Real-Time Audio Library
+  * Windows WAVEFORMAT* data structure utilities
+@@ -158,3 +159,4 @@
+         }
+     */
+ }
++#endif
+diff -ur -x '*.[oa]' ../audio/pa_win_wmme.c ../audio/pa_win_wmme.c
+--- ../audio/pa_win_wmme.c	2008-07-03 16:46:33.000000000 -0400
++++ ../audio/pa_win_wmme.c	2010-04-09 08:48:44.000000000 -0400
+@@ -1,3 +1,4 @@
++#ifdef _WIN32
+ /*
+  * $Id: pa_win_wmme.c 1286 2007-09-26 21:34:23Z rossb $
+  * pa_win_wmme.c
+@@ -3894,8 +3895,5 @@
+     else
+         return 0;
+ }
+-
+-
+-
+-
++#endif
+ 
+diff -ur -x '*.[oa]' ../makefile ../makefile
+--- ../makefile	2010-02-22 17:38:03.000000000 -0500
++++ ../makefile	2010-04-09 08:57:29.000000000 -0400
+@@ -3,6 +3,8 @@
+ # Makefile for Praat.
+ # Paul Boersma, 20 February 2010
+ 
++EXE=praat
++
+ # System-dependent definitions of CC, LIBS, ICON and MAIN_ICON should be in
+ # makefile.defs, which has to be copied and renamed
+ # from a suitable makefile.defs.XXX file in the makefiles directory,
+@@ -29,11 +31,11 @@
+ 	$(MAKE) -C artsynth
+ 	$(MAKE) -C contrib/ola
+ 	$(MAKE) -C main main_Praat.o $(ICON)
+-	$(CC) -o praat main/main_Praat.o $(MAIN_ICON) fon/libfon.a contrib/ola/libOla.a \
++	$(CC) -o $(EXE) main/main_Praat.o $(MAIN_ICON) fon/libfon.a contrib/ola/libOla.a \
+ 		LPC/libLPC.a FFNet/libFFNet.a gram/libgram.a dwtools/libdwtools.a \
+ 		artsynth/libartsynth.a fon/libfon.a stat/libstat.a dwsys/libdwsys.a \
+ 		sys/libsys.a num/libnum.a GSL/libgsl.a num/glpk/libglpk.a kar/libkar.a \
+ 		audio/libaudio.a audio/FLAC/libFLAC.a audio/mp3/libmp3.a \
+ 		$(LIBS)
+ 
+ clean:
+diff -ur -x '*.[oa]' ../makefiles/makefile.defs.mingw ../makefiles/makefile.defs.mingw
+--- ../makefiles/makefile.defs.mingw	2007-03-20 17:46:59.000000000 -0400
++++ ../makefiles/makefile.defs.mingw	2010-04-09 08:57:59.000000000 -0400
+@@ -3,10 +3,12 @@
+ # System: MinGW
+ # Eric Carlson & Paul Boersma, March 20, 2007
+ 
+-CC = mingw32-gcc -D_WIN32 -DMINGW -std=gnu99 -DDONT_INCLUDE_QUICKTIME -Dmain=wingwmain -mwindows -O2
++CC = mingw32-gcc -D_WIN32 -DMINGW -DUNICODE -std=gnu99 -DDONT_INCLUDE_QUICKTIME -Dmain=wingwmain -mwindows -O2
+ 
+ LIBS = -lwinmm -lwsock32 -lcomctl32
+ 
+-RANLIB = ls
++RANLIB = i586-mingw32msvc-ranlib
+ ICON = praat_win.o
+ MAIN_ICON = main/praat_win.o
++
++EXE=praat.exe
+@@ -352,10 +353,12 @@
+ 			infoTipsWereVisible = settings. fShowInfoTip != 0;
+ 			extensionsWereVisible = settings. fShowExtensions != 0;
+ 			if (infoTipsWereVisible | ! extensionsWereVisible) {
++				#if (_WIN32_WINNT >= 0x0500)
+ 				SHELLSTATE state = { 0 };
+ 				state. fShowInfoTip = 0;
+ 				state. fShowExtensions = /*1*/ extensionsWereVisible;
+ 				SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++				#endif
+ 			}
+ 		}
+ 		if (GetOpenFileNameW (& openFileName)) {
+@@ -411,10 +414,12 @@
+ 		}
+ 		if (hasFileInfoTipsBug) {
+ 			if (infoTipsWereVisible | ! extensionsWereVisible) {
++				#if (_WIN32_WINNT >= 0x0500)
+ 				SHELLSTATE state = { 0 };
+ 				state. fShowInfoTip = infoTipsWereVisible;
+ 				state. fShowExtensions = extensionsWereVisible;
+ 				SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++				#endif
+ 			}
+ 		}
+ 	#else
+@@ -652,10 +657,12 @@
+ 		bool infoTipsWereVisible = settings. fShowInfoTip != 0;
+ 		bool extensionsWereVisible = settings. fShowExtensions != 0;
+ 		if (infoTipsWereVisible || ! extensionsWereVisible) {
++			#if (_WIN32_WINNT >= 0x0500)
+ 			SHELLSTATE state = { 0 };
+ 			state. fShowInfoTip = 0;
+ 			state. fShowExtensions = /*1*/ extensionsWereVisible;
+ 			SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++			#endif
+ 		}
+ 		if (GetSaveFileNameW (& openFileName)) {
+ 			if (my allowExecutionHook && ! my allowExecutionHook (my allowExecutionClosure)) {
+@@ -673,10 +680,12 @@
+ 			UiHistory_write (Melder_fileToPath (& my file));
+ 		}
+ 		if (infoTipsWereVisible || ! extensionsWereVisible) {
++			#if (_WIN32_WINNT >= 0x0500)
+ 			SHELLSTATE state = { 0 };
+ 			state. fShowInfoTip = infoTipsWereVisible;
+ 			state. fShowExtensions = extensionsWereVisible;
+ 			SHGetSetSettings (& state, SSF_SHOWINFOTIP | SSF_SHOWEXTENSIONS, TRUE);
++			#endif
+ 		}
+ 	#else
+ 		#if motif

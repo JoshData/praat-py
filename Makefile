@@ -1,5 +1,3 @@
-UPVER=5117
-
 include ../makefile.defs
 
 DISTFILES=README Makefile \
@@ -27,11 +25,8 @@ util.o: util.c util.h
 sendpraat: ../sys/sendpraat.c sendpraat_main.c
 	$(CC) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
 
-praat-py.patch:
-	diff -ur -x "*.[oa]" ../../sources_${UPVER}/ ..|grep -v "Only in .." > praat-py.patch
-
-patch-praat:
-	patch -p0 < praat-py.patch
+#praat-py.patch:
+#	diff -ur -x "*.[oa]" ../../sources/ ..|grep -v "Only in .." > praat-py.patch
 
 dist/praat-py.zip: $(DISTFILES)
 	sed -i s/_snwprintf/swprintf/g *.c
