@@ -1,6 +1,6 @@
-diff -ur -x '*.[oa]' sources_5308//makefile sources_current//makefile
---- sources_5308//makefile	2012-01-14 07:28:16.000000000 -0500
-+++ sources_current//makefile	2012-03-07 13:10:54.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/makefile sources_current/makefile
+--- sources_5308/makefile	2012-01-14 07:28:16.000000000 -0500
++++ sources_current/makefile	2012-03-07 13:10:54.000000000 -0500
 @@ -31,6 +31,7 @@
  	$(MAKE) -C artsynth
  	$(MAKE) -C contrib/ola
@@ -24,9 +24,9 @@ diff -ur -x '*.[oa]' sources_5308//makefile sources_current//makefile
 +	$(MAKE) -C scripting clean
  	# $(MAKE) -C main clean
  	$(RM) praat
-diff -ur -x '*.[oa]' sources_5308//makefiles/makefile.defs.linux sources_current//makefiles/makefile.defs.linux
---- sources_5308//makefiles/makefile.defs.linux	2011-09-08 07:55:55.000000000 -0400
-+++ sources_current//makefiles/makefile.defs.linux	2012-03-07 13:10:06.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/makefiles/makefile.defs.linux sources_current/makefiles/makefile.defs.linux
+--- sources_5308/makefiles/makefile.defs.linux	2011-09-08 07:55:55.000000000 -0400
++++ sources_current/makefiles/makefile.defs.linux	2012-03-07 13:10:06.000000000 -0500
 @@ -13,7 +13,7 @@
  
  LINK = g++
@@ -36,9 +36,9 @@ diff -ur -x '*.[oa]' sources_5308//makefiles/makefile.defs.linux sources_current
  
  LIBS = `pkg-config --libs gtk+-2.0` -lm -lasound
  
-diff -ur -x '*.[oa]' sources_5308//makefiles/makefile.defs.mingw32 sources_current//makefiles/makefile.defs.mingw32
---- sources_5308//makefiles/makefile.defs.mingw32	2011-09-14 11:15:37.000000000 -0400
-+++ sources_current//makefiles/makefile.defs.mingw32	2012-03-07 13:11:56.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/makefiles/makefile.defs.mingw32 sources_current/makefiles/makefile.defs.mingw32
+--- sources_5308/makefiles/makefile.defs.mingw32	2011-09-14 11:15:37.000000000 -0400
++++ sources_current/makefiles/makefile.defs.mingw32	2012-03-07 13:11:56.000000000 -0500
 @@ -15,7 +15,7 @@
  
  LINK = /mingw32/bin/g++
@@ -48,9 +48,9 @@ diff -ur -x '*.[oa]' sources_5308//makefiles/makefile.defs.mingw32 sources_curre
  
  LIBS = -L/mingw32/lib -lwinmm -lwsock32 -lcomctl32 -lole32 -lgdi32 -lgdiplus -lcomdlg32 -static-libgcc -static-libstdc++ -mwindows
  #LIBS = -L/mingw32/lib -lwinmm -lwsock32 -lcomctl32 -lole32 -lgdi32 -lgdiplus -lcomdlg32 /mingw32/lib/QTMLClient.lib -static-libgcc -static-libstdc++ -mwindows
-diff -ur -x '*.[oa]' sources_5308//sys/Interpreter.cpp sources_current//sys/Interpreter.cpp
---- sources_5308//sys/Interpreter.cpp	2012-03-03 15:54:10.000000000 -0500
-+++ sources_current//sys/Interpreter.cpp	2012-03-07 13:34:03.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/sys/Interpreter.cpp sources_current/sys/Interpreter.cpp
+--- sources_5308/sys/Interpreter.cpp	2012-03-03 15:54:10.000000000 -0500
++++ sources_current/sys/Interpreter.cpp	2012-03-07 13:34:03.000000000 -0500
 @@ -61,6 +61,7 @@
  #include "Formula.h"
  #include "praat_version.h"
@@ -74,9 +74,9 @@ diff -ur -x '*.[oa]' sources_5308//sys/Interpreter.cpp sources_current//sys/Inte
  	autoNUMvector <wchar *> lines;   // not autostringvector, because the elements are reference copies
  	long lineNumber = 0;
  	bool assertionFailed = false;
-diff -ur -x '*.[oa]' sources_5308//sys/Interpreter.h sources_current//sys/Interpreter.h
---- sources_5308//sys/Interpreter.h	2011-08-15 09:42:29.000000000 -0400
-+++ sources_current//sys/Interpreter.h	2012-03-07 13:39:11.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/sys/Interpreter.h sources_current/sys/Interpreter.h
+--- sources_5308/sys/Interpreter.h	2011-08-15 09:42:29.000000000 -0400
++++ sources_current/sys/Interpreter.h	2012-11-11 13:05:03.000000000 -0500
 @@ -55,6 +55,7 @@
  		long labelLines [1+Interpreter_MAXNUM_LABELS];
  		wchar dialogTitle [1+100], procedureNames [1+Interpreter_MAX_CALL_DEPTH] [100];
@@ -85,7 +85,7 @@ diff -ur -x '*.[oa]' sources_5308//sys/Interpreter.h sources_current//sys/Interp
  		bool running, stopped;
  	// overridden methods:
  	protected:
-@@ -78,9 +79,12 @@
+@@ -78,6 +79,7 @@
  void Interpreter_stringExpression (Interpreter me, const wchar *expression, wchar **value);
  void Interpreter_numericArrayExpression (Interpreter me, const wchar *expression, struct Formula_NumericArray *value);
  void Interpreter_anyExpression (Interpreter me, const wchar *expression, struct Formula_Result *result);
@@ -93,14 +93,9 @@ diff -ur -x '*.[oa]' sources_5308//sys/Interpreter.h sources_current//sys/Interp
  
  InterpreterVariable Interpreter_hasVariable (Interpreter me, const wchar *key);
  InterpreterVariable Interpreter_lookUpVariable (Interpreter me, const wchar *key);
- 
-+extern "C" int scripting_run_praat_script(void*, wchar_t*, wchar_t**);
-+
- /* End of file Interpreter.h */
- #endif
-diff -ur -x '*.[oa]' sources_5308//sys/praat.cpp sources_current//sys/praat.cpp
---- sources_5308//sys/praat.cpp	2012-02-18 07:04:25.000000000 -0500
-+++ sources_current//sys/praat.cpp	2012-03-07 13:17:44.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/sys/praat.cpp sources_current/sys/praat.cpp
+--- sources_5308/sys/praat.cpp	2012-02-18 07:04:25.000000000 -0500
++++ sources_current/sys/praat.cpp	2012-03-07 13:17:44.000000000 -0500
 @@ -1193,13 +1193,16 @@
  	if (Melder_batch) {
  		#if defined (UNIX) || defined (macintosh) || defined (_WIN32) && defined (CONSOLE_APPLICATION)
@@ -127,9 +122,9 @@ diff -ur -x '*.[oa]' sources_5308//sys/praat.cpp sources_current//sys/praat.cpp
  				praat_exit (0);
  			} catch (MelderError) {
  				/*
-diff -ur -x '*.[oa]' sources_5308//sys/praat.h sources_current//sys/praat.h
---- sources_5308//sys/praat.h	2011-09-13 11:43:34.000000000 -0400
-+++ sources_current//sys/praat.h	2012-03-07 13:27:08.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/sys/praat.h sources_current/sys/praat.h
+--- sources_5308/sys/praat.h	2011-09-13 11:43:34.000000000 -0400
++++ sources_current/sys/praat.h	2012-03-07 13:27:08.000000000 -0500
 @@ -144,6 +144,7 @@
  	int batch;   /* Was the program called from the command line? */
  	GuiObject topShell;   /* The application shell: parent of editors and standard dialogs. */
@@ -138,9 +133,9 @@ diff -ur -x '*.[oa]' sources_5308//sys/praat.h sources_current//sys/praat.h
  } structPraatApplication, *PraatApplication;
  typedef struct {   /* Readonly */
  	int n;	 /* The current number of objects in the list. */
-diff -ur -x '*.[oa]' sources_5308//sys/praat_script.cpp sources_current//sys/praat_script.cpp
---- sources_5308//sys/praat_script.cpp	2011-09-11 17:11:54.000000000 -0400
-+++ sources_current//sys/praat_script.cpp	2012-03-07 13:31:28.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/sys/praat_script.cpp sources_current/sys/praat_script.cpp
+--- sources_5308/sys/praat_script.cpp	2011-09-11 17:11:54.000000000 -0400
++++ sources_current/sys/praat_script.cpp	2012-03-07 13:31:28.000000000 -0500
 @@ -412,6 +412,10 @@
  }
  
@@ -182,9 +177,9 @@ diff -ur -x '*.[oa]' sources_5308//sys/praat_script.cpp sources_current//sys/pra
  }
  
  void praat_executeScriptFromText (wchar *text) {
-diff -ur -x '*.[oa]' sources_5308//sys/praat_script.h sources_current//sys/praat_script.h
---- sources_5308//sys/praat_script.h	2011-08-15 20:55:24.000000000 -0400
-+++ sources_current//sys/praat_script.h	2012-03-07 13:29:08.000000000 -0500
+diff -ur -x '*.[oa]' sources_5308/sys/praat_script.h sources_current/sys/praat_script.h
+--- sources_5308/sys/praat_script.h	2011-08-15 20:55:24.000000000 -0400
++++ sources_current/sys/praat_script.h	2012-03-07 13:29:08.000000000 -0500
 @@ -24,7 +24,9 @@
  void praat_executeCommand (Interpreter me, wchar *command);
  void praat_executeCommandFromStandardInput (const char *programName);

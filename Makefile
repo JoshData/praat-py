@@ -1,7 +1,7 @@
 include ../makefile.defs
 
 DISTFILES=README Makefile \
-		scripting.c scripting.h python.c util.c util.h \
+		scripting.cpp scripting.h python.c util.c util.h \
 		praat-py.patch
 
 ifeq ($(EXE), praat.exe)
@@ -13,8 +13,8 @@ all: scripting.o python.o util.o
 clean:
 	rm *.o
 
-scripting.o: scripting.c scripting.h
-	$(CC) -c scripting.c -o scripting.o
+scripting.o: scripting.cpp scripting.h
+	$(CXX) -c scripting.cpp -o scripting.o -I../num -I../sys $(CXXFLAGS)
 	
 python.o: python.c
 	$(CC) -c python.c -o python.o `python-config --cflags`
@@ -25,11 +25,11 @@ util.o: util.c util.h
 sendpraat: ../sys/sendpraat.c sendpraat_main.c
 	$(CC) -o sendpraat ../sys/sendpraat.c sendpraat_main.c -lXm
 
-#praat-py.patch:
-#	diff -ur -x "*.[oa]" ../../sources/ ..|grep -v "Only in .." > praat-py.patch
+praat-py.patch:
+	cd ../..; diff -ur -x "*.[oa]" sources_5308/ sources_current/ | grep -v "Only in" > sources_current/scripting/praat-py.patch;
 
 dist/praat-py.zip: $(DISTFILES)
-	sed -i s/_snwprintf/swprintf/g *.c
+	sed -i s/_snwprintf/swprintf/g *.cpp
 	rm -f dist/praat-py.zip
 	zip dist/praat-py.zip $(DISTFILES)
 

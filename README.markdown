@@ -235,12 +235,12 @@ window. Say "myscript.praatpy" is a Praat-Py script, i.e. a Python program
 beginning with "#lang=python". You can then run it as:
 
     
-    praat myscript.praatpy
+    praat-py myscript.praatpy
 
 You can also pass command-line parameters to the script:
 
     
-    praat myscript.praatpy arg1 arg2
+    praat-py myscript.praatpy arg1 arg2
 
 ...and access them with `argv` similar to the usual Python sys.argv list. The
 first element in this list is the name of the script itself.
@@ -294,6 +294,7 @@ source files:
 
     
     make
+    ./praat-py # it runs!
     
 
 The `praat-py` executable in the current directory will now support Python

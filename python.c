@@ -1,4 +1,5 @@
-// This file handles Python scripting for Praat.
+// This file handles Python scripting for Praat. It interfaces
+// with Praat only through scripting.cpp.
 
 #include <stdio.h>
 #include <wchar.h>
@@ -7,11 +8,6 @@
 #include <structmember.h>
 
 #include "util.h"
-#include "scripting.h"
-
-#include "../sys/melder.h"
-int praat_selection (void *klas);
-wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);
 
 static wchar_t **global_argv;
 
@@ -239,10 +235,10 @@ static PyObject *extfunc_selected(PyObject *self, PyObject *args) {
 		return NULL;
 	
 	// Prevents errors below if nothing is selected.
-	if (praat_selection(NULL) == 0)
+	if (!is_anything_selected())
 		return Py_BuildValue("");
 	
-	wchar_t *name = praat_getNameOfSelected(NULL, 0);
+	wchar_t *name = get_name_of_selected();
 	if (name == NULL)
 		return Py_BuildValue("");
 
@@ -319,7 +315,7 @@ static PyObject *extfunc_InfoWindowWrite(PyObject *self, PyObject *args) {
 	if (mbsrtowcs (buffer, &str, sizeof(buffer)/sizeof(wchar_t), NULL) == -1)
 		wcscpy(buffer, L"[wide character conversion failed]");
 
-	Melder_print (buffer);
+	write_to_info_window(buffer);
 
 	return Py_BuildValue("");
 }

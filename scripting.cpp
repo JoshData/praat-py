@@ -1,25 +1,25 @@
 // This file is the glue between Praat's script interpreter
-// and external script interpreters like Python.
+// and our script interpreter.
 
 #include <stdio.h>
 #include <wchar.h>
 
+#include "../sys/melder.h"
+#include "../sys/praatP.h"
+#include "../sys/praat_script.h"
+
 #include "util.h"
 #include "scripting.h"
 
-#include "../sys/melder.h"
-int praat_executeCommand (void *interpreter, const wchar_t *command);
-wchar_t * praat_getNameOfSelected (void *voidklas, int inplace);
+/* Interface from Python (C) into Praat (C++). */
 
-/* Interface into Praat. */
+static Interpreter current_interpreter = NULL; // global state; bad programming style, yes
 
-static void *current_interpreter = NULL; // global state; bad programming style, yes
-
-void scripting_executePraatCommand2(wchar_t *command) {
+extern "C" void scripting_executePraatCommand2(wchar_t *command) {
 	praat_executeCommand (current_interpreter, command);
 }
 
-wchar_t *scripting_executePraatCommand (wchar_t **commandargs, int divert, int *haderror) {
+extern "C" wchar_t *scripting_executePraatCommand (wchar_t **commandargs, int divert, int *haderror) {
 	// This runs a Praat Script command whose command and arguments are stored
 	// in the NULL-terminated commandargs array, which *this function* frees
 	// (along with its elements) once it's done using it.
@@ -117,21 +117,21 @@ wchar_t *scripting_executePraatCommand (wchar_t **commandargs, int divert, int *
 	}
 }
 
-char *wc2c(wchar_t *wc, int doFree) {
-	const wchar_t *wc2 = wc;
-	size_t clen = wcslen(wc) * 4;
-	if (clen < 32) clen = 32;
-	char *cret = (char*)malloc(clen);
-	if (wcsrtombs (cret, &wc2, clen, NULL) == -1) {
-		strcpy(cret, "[wide character conversion failed]");
-	}
-	if (doFree) free(wc);
-	return cret;
+extern "C" int is_anything_selected() {
+	return praat_selection(NULL) != 0;
 }
 
-/* The main entry point. */
+extern "C" wchar_t *get_name_of_selected() {
+	return praat_getNameOfSelected(NULL, 0);
+}
 
-int scripting_run_praat_script(void *interpreter, wchar_t *script, wchar_t **argv) {
+extern "C" void write_to_info_window(wchar_t *text) {
+	Melder_print (text);
+}
+
+/* Interface from Praat (C++) into Python (C). */
+
+int scripting_run_praat_script(Interpreter interpreter, wchar_t *script, wchar_t **argv) {
 	if (wcsncmp(script, L"#lang=", 6) != 0)
 		return 0;
 

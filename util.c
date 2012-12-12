@@ -5,6 +5,19 @@
 #include <wchar.h>
 #include "util.h"
 
+
+char *wc2c(wchar_t *wc, int doFree) {
+	const wchar_t *wc2 = wc;
+	size_t clen = wcslen(wc) * 4;
+	if (clen < 32) clen = 32;
+	char *cret = (char*)malloc(clen);
+	if (wcsrtombs (cret, &wc2, clen, NULL) == -1) {
+		strcpy(cret, "[wide character conversion failed]");
+	}
+	if (doFree) free(wc);
+	return cret;
+}
+
 #ifndef __USE_GNU
 
 // These functions are common extensions but we are compiling
